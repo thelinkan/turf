@@ -2,43 +2,45 @@ import pandas as pd
 import json
 
 # define file list and initialize a dictionary to store the data
-file_list =['takes202210.json', 'takes202204.json', 'takes202110.json', 'takes202104.json','takes202010.json', 'takes202004.json', 'takes201910.json', 'takes201904.json','takes201810.json', 'takes201804.json', 'takes201710.json']
+file_list =['takes202210', 'takes202204', 'takes202110', 'takes202104','takes202010', 'takes202004', 'takes201910', 'takes201904','takes201810', 'takes201804', 'takes201710']
 data_dict = {}
 
 # loop through each file and read the data
 for file in file_list:
-    with open(f"data/{file}") as f:
+    with open(f"data/{file}.json") as f:
         data = json.load(f)
         counts = {f['properties']['title']: f['properties']['count'] for f in data['features']}
-        data_dict[file[:-5]] = counts
+        data_dict[file] = counts
 
 # create pandas dataframe
 df = pd.DataFrame.from_dict(data_dict, orient='columns')
 df = df.fillna(0)
+df_total = df
 
+#df_total_index = pd.to_datetime(df.index.str[5:], format='%Y%m')
 # create new column
-df['takes202210halfyear'] = df['takes202210'] - df['takes202204']
-df['takes202104halfyear'] = df['takes202104'] - df['takes202110']
-df['takes202110halfyear'] = df['takes202110'] - df['takes202104']
-df['takes202004halfyear'] = df['takes202104'] - df['takes202010']
-df['takes202010halfyear'] = df['takes202010'] - df['takes202004']
-df['takes202004halfyear'] = df['takes202004'] - df['takes201910']
-df['takes201910halfyear'] = df['takes201910'] - df['takes201904']
-df['takes201904halfyear'] = df['takes201904'] - df['takes201810']
-df['takes201810halfyear'] = df['takes201810'] - df['takes201804']
-df['takes201804halfyear'] = df['takes201804'] - df['takes201710']
+num_periods = len (file_list)
 
-#for col in df.columns:
-#    if 'takes' in col:
-#        halfyear_col_name = col + 'halfyear'
-#        df[halfyear_col_name] = df[col] - df[col.replace('202210', '202204')]
+for i in range(num_periods-1):
+    halfyear_col_name = file_list[i]+'halfyear'
+    df[halfyear_col_name] = df[file_list[i]]-df[file_list[i+1]]
 
-
-
-df['takes202210year'] = df['takes202210'] - df['takes202110']
+for i in range(num_periods-2):
+    halfyear_col_name = file_list[i]+'year'
+    df[halfyear_col_name] = df[file_list[i]]-df[file_list[i+2]]
 
 # get top 10 takes totaly
 top10_takes_totaly = df['takes202210'].nlargest(10).astype(int)
+
+top10_zones = list(top10_takes_totaly.index)
+
+print(df_total)
+
+counts = {}
+#for col in df_total.columns:
+#    counts[col] ={
+#            '2-20': ((df[col] 
+#        }
 
 # get top 10 takes last six months
 top10_takes_last_six_months = df['takes202210halfyear'].nlargest(10).astype(int)
@@ -62,4 +64,4 @@ print("\nTop 10 takes last six months (201804):")
 print(top10_takes_last_six_months_201804)
 
 
-print(df.loc['MarinaZone'])
+print(df.loc['GultGuld'])
