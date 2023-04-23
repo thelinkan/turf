@@ -39,7 +39,7 @@ def takes_data(df):
     return df_counts
 
 
-def plot_series(*series, title='Line Plot', xlabel='X-axis', ylabel='Y-axis'):
+def plot_series(*series, filename = 'file.png' , title='Line Plot', xlabel='X-axis', ylabel='Y-axis'):
     """
     Creates a line plot for each of the given series on the same figure.
 
@@ -60,7 +60,10 @@ def plot_series(*series, title='Line Plot', xlabel='X-axis', ylabel='Y-axis'):
 
     # Add legend
     plt.legend()
-
+    plt.savefig(filename, dpi=300)
+    plt.close()
+    
+    
     # Display the plot
     #plt.show()
     
