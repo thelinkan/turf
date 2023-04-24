@@ -31,7 +31,7 @@ def takes_data(df):
             '101 - 250': df_tot_test.loc[(df_tot_test > 100) & (df_tot_test <= 250)].count(),
             '251 - 500': df_tot_test.loc[(df_tot_test > 250) & (df_tot_test <= 500)].count(),
             '501 - 1000': df_tot_test.loc[(df_tot_test > 500) & (df_tot_test <= 1000)].count(),
-            '1001+': df_tot_test.loc[(df_tot_test > 1000)].count(),
+            '1001 och mer': df_tot_test.loc[(df_tot_test > 1000)].count(),
             'Totalt': df_tot_test.loc[(df_tot_test > 0)].count()
         }
     df_counts = pd.DataFrame.from_dict(counts)

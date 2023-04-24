@@ -12,7 +12,7 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle, 
 
 from format_data import import_data, takes_data, plot_series
 
-file_list = ['takes201710', 'takes201804','takes201810', 'takes201904', 'takes201910', 'takes202004','takes202010', 'takes202104', 'takes202110', 'takes202204', 'takes202210']
+file_list = ['takes201610', 'takes201704','takes201710', 'takes201804','takes201810', 'takes201904', 'takes201910', 'takes202004','takes202010', 'takes202104', 'takes202110', 'takes202204', 'takes202210']
 manad_lista = ["januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"]
 num_obs = len(file_list)
 artal = file_list[num_obs-1][5:9]
@@ -25,6 +25,7 @@ else:
     period_text = f"sommarhalvåret {artal}"
 
 df = import_data(file_list)
+print(df)
 df_counts = takes_data(df)
 print(df_counts)
 df_counts_trans = df_counts.transpose()
@@ -32,15 +33,36 @@ df_counts_trans = df_counts.transpose()
 
 
 df_halfyear = df
+df_halfyear = df_halfyear.reset_index()
+df_halfyear = df_halfyear.rename(columns={'index': 'Zone'})
+df_halfyear = df_halfyear.set_index('Zone')
+
+print(df_halfyear)
+
 for i in range(1,num_obs):
     halfyear_col_name = file_list[i]+'halfyear'
     df_halfyear[halfyear_col_name] = df_halfyear[file_list[i]]-df_halfyear[file_list[i-1]]
 
+df_filtered = df_halfyear[(df_halfyear[file_list[num_obs-2]] == 0) & (df_halfyear.iloc[:, -1] > 0)][[df_halfyear.columns[-2], df_halfyear.columns[-1]]]
+num_zones_halfyear = (df_halfyear[df_halfyear.columns[-1]] > 0).sum()
+takes_halfyear =  int(df_halfyear[df_halfyear.columns[-1]].sum())
+num_zones_newzones = (df_filtered[df_halfyear.columns[-1]] > 0).sum()
+takes_newzones = int(df_filtered[df_halfyear.columns[-1]].sum())
+df_filtered_2 = df_halfyear[(df[file_list[num_obs-2]] > 0) & (df.iloc[:, -1] == 0)][[df.columns[-2], df.columns[-1]]]
+num_zones_changed = (df_filtered_2[df.columns[-2]] > 0).sum()
+takes_changed = int(df_filtered_2[df.columns[-1]].sum())
+num_zones_newzones = num_zones_newzones - num_zones_changed
+takes_newzones = takes_newzones - takes_changed
 
-top10_takes_last_six_months = df[halfyear_col_name].nlargest(10).astype(int)
+#print(file_list[num_obs-1])
+#print(df_halfyear[file_list[num_obs-1]])
+print(df_filtered_2)
+
+top10_takes_last_six_months = df_halfyear[halfyear_col_name].nlargest(10).astype(int)
 top10_takes_total = df[file_list[num_obs-1]].nlargest(10).astype(int)
 
 #print(top10_takes_last_six_months)
+print(df_filtered)
 
 # Create a PDF document with A4 size
 doc = SimpleDocTemplate("turfrapport.pdf", pagesize=A4)
@@ -64,9 +86,29 @@ zone_list = top10_takes_last_six_months.index.values
 #else:
 #    zone_name = ""
 total_t0 = df_counts_trans['Totalt'][num_obs-1]
+gron_t0 =  df_counts_trans['1'][num_obs-1]
+gul_t0 =  df_counts_trans['2 - 10'][num_obs-1]
+orange_t0 = df_counts_trans['11 - 20'][num_obs-1]
+rod_t0 = df_counts_trans['11 - 20'][num_obs-1]
+
 total_t1 = df_counts_trans['Totalt'][num_obs-2]
+gron_t1 =  df_counts_trans['1'][num_obs-2]
+gul_t1 =  df_counts_trans['2 - 10'][num_obs-2]
+orange_t1 = df_counts_trans['11 - 20'][num_obs-2]
+rod_t1 = df_counts_trans['11 - 20'][num_obs-2]
+
 total_t2 = df_counts_trans['Totalt'][num_obs-3]
+gron_t2 =  df_counts_trans['1'][num_obs-3]
+gul_t2 =  df_counts_trans['2 - 10'][num_obs-3]
+orange_t2 = df_counts_trans['11 - 20'][num_obs-3]
+rod_t2 = df_counts_trans['11 - 20'][num_obs-3]
+
 total_t3 = df_counts_trans['Totalt'][num_obs-4]
+gron_t3 =  df_counts_trans['1'][num_obs-4]
+gul_t3 =  df_counts_trans['2 - 10'][num_obs-4]
+orange_t3 = df_counts_trans['11 - 20'][num_obs-4]
+rod_t3 = df_counts_trans['11 - 20'][num_obs-4]
+
 nya_unika_t0 = total_t0 - total_t1
 nya_unika_t1 = total_t1 - total_t2
 nya_unika_t2 = total_t2 - total_t3
@@ -76,18 +118,19 @@ if(top10_takes_last_six_months.index.values[0] == top10_takes_total.index.values
     introtext = introtext + f" Även den totalt vanligaste zonen under turfkariären är {top10_takes_total.index.values[0]} med totalt {top10_takes_total[0]} besök."
 else:
     introtext = introtext + f" Den totalt sett vanligaste zonen under turfkariären är {top10_takes_total.index.values[0]} med totalt {top10_takes_total[0]} besök."
-introtext = introtext + f" Totalt togs {nya_unika_t0} nya unika zoner under {period_text}, jämfört med {nya_unika_t1} under halvåret innan."
+introtext = introtext + f" Totalt togs {nya_unika_t0} nya unika zoner under {period_text}, jämfört med {nya_unika_t1} under halvåret innan. "
 intro_paragraph = Paragraph(introtext, style_normal)
 
 wardedfarger_heading = Paragraph("Wardedfärger", style_small_title)
 
 wardedtext = "I detta avsnitt kommer information om hur många zoner som har respektive wardedfärg. "
 wardedtext = wardedtext + "Förutom de vanliga färgerna grön, gul, röd och lila, så har de lila zonerna delats upp i 51-100, 101-250, 251-500, 501-1000 och 1001+. "
+wardedtext = wardedtext + "Ibland kan antalet zoner i en grupp minska, det beror på att fler zoner har flyttats upp en nivå, än som har tillkommit i den aktuella nivån. "
 wardedtext = wardedtext + ""
 warded_paragraph = Paragraph(wardedtext, style_normal)
 
-table_data = [list(df_counts.columns)] + [list(row) for row in df_counts.values]
-table = Table(table_data)
+table_wardedfarger_data = [list(df_counts.columns)] + [list(row) for row in df_counts.values]
+table_wardedfarger = Table(table_wardedfarger_data)
 # Add style to the table
 style = TableStyle([
     ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
@@ -111,15 +154,30 @@ style = TableStyle([
 ])
 
 # Apply style to the table
-table.setStyle(style)
+table_wardedfarger.setStyle(style)
 
-print(table)
+plot_series(df_counts_trans['2 - 10'],df_counts_trans['11 - 20'],df_counts_trans['21 - 50'], filename = '2till50.png')
+diagram_2till50 = Image("2till50.png", width = 14*cm, height = 7 * cm)
+plot_series(df_counts_trans['51 - 100'],df_counts_trans['101 - 250'], filename = '51till250.png')
+diagram_51till250 = Image("51till250.png", width = 14*cm, height = 7 * cm)
+plot_series(df_counts_trans['251 - 500'],df_counts_trans['501 - 1000'],df_counts_trans['1001 och mer'], filename = '251ochmer.png')
+diagram_251ochmer = Image("251ochmer.png", width = 14*cm, height = 7 * cm)
 
-plot_series(df_counts_trans['1'],df_counts_trans['2 - 10'],df_counts_trans['11 - 20'], filename = '1till20.png')
-diagram_1till20 = Image("1till20.png", width = 10*cm, height = 7 * cm)
+halfyear_heading = Paragraph("Senaste 6 månadernas turfande", style_small_title)
+
+halfyeartext = f"Under de senaste 6 månadernas turfande gjordes totalt {takes_halfyear} besök vid {num_zones_halfyear} olika zoner. "
+halfyeartext = halfyeartext + f"Av dessa besök gjordes {takes_newzones} besök vid {num_zones_newzones} nya zoner. "
+halfyeartext = halfyeartext + f""
+halfyear_paragraph = Paragraph(halfyeartext, style_normal)
+
+table_halfyear_data = [("Zon", "Besök")] + [(idx, val) for idx, val in top10_takes_last_six_months.items()]
+table_halfyear = Table(table_halfyear_data)
+table_halfyear.setStyle(style)
 
 # Build the report content
-flowables = [heading, intro_paragraph, wardedfarger_heading, warded_paragraph, table, diagram_1till20]
+flowables = [heading, intro_paragraph, wardedfarger_heading, warded_paragraph, table_wardedfarger,
+             diagram_2till50, diagram_51till250, diagram_251ochmer, halfyear_heading, halfyear_paragraph,
+             table_halfyear]
 
 # Set up the document and write the content
 doc.build(flowables)
