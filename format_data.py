@@ -1,6 +1,7 @@
 import pandas as pd
 import json
 import matplotlib.pyplot as plt
+import os
 
 def import_data(file_list):
     data_dict = {}
@@ -14,8 +15,21 @@ def import_data(file_list):
 
     # create pandas dataframe
     df = pd.DataFrame.from_dict(data_dict, orient='columns')
-    df = df.fillna(0)   
-    
+    df = df.fillna(0)
+
+    # apply changes to zone names
+    for file in os.listdir('data'):
+        if file.startswith('changes') and file.endswith('.json'):
+            with open(f"data/{file}") as f:
+                changes = json.load(f)
+                print(changes)
+                for feature in changes['features']:
+                    old_name = feature['properties']['old_name']
+                    new_name = feature['properties']['new_name']
+                    for col in df.columns:
+                        if old_name in df.index:
+                            df.rename(index={old_name: new_name}, inplace=True)
+
     return df
     
 def takes_data(df):
@@ -57,6 +71,7 @@ def plot_series(*series, filename = 'file.png' , title='Line Plot', xlabel='X-ax
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
+    plt.xticks(rotation=45)
 
     # Add legend
     plt.legend()

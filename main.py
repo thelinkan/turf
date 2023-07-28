@@ -12,7 +12,7 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle, 
 
 from format_data import import_data, takes_data, plot_series
 
-file_list = ['takes201610', 'takes201704','takes201710', 'takes201804','takes201810', 'takes201904', 'takes201910', 'takes202004','takes202010', 'takes202104', 'takes202110', 'takes202204', 'takes202210']
+file_list = ['takes201610', 'takes201704','takes201710', 'takes201804','takes201810', 'takes201904', 'takes201910', 'takes202004','takes202010', 'takes202104', 'takes202110', 'takes202204', 'takes202210', 'takes202304']
 manad_lista = ["januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"]
 num_obs = len(file_list)
 artal = file_list[num_obs-1][5:9]
@@ -156,18 +156,18 @@ style = TableStyle([
 # Apply style to the table
 table_wardedfarger.setStyle(style)
 
-plot_series(df_counts_trans['2 - 10'],df_counts_trans['11 - 20'],df_counts_trans['21 - 50'], filename = '2till50.png')
+plot_series(df_counts_trans['2 - 10'],df_counts_trans['11 - 20'],df_counts_trans['21 - 50'], filename = '2till50.png', title='gula till röda', xlabel='halvår', ylabel='Besök')
 diagram_2till50 = Image("2till50.png", width = 14*cm, height = 7 * cm)
-plot_series(df_counts_trans['51 - 100'],df_counts_trans['101 - 250'], filename = '51till250.png')
+plot_series(df_counts_trans['51 - 100'],df_counts_trans['101 - 250'], filename = '51till250.png', title='Ljuslila', xlabel='halvår', ylabel='Besök')
 diagram_51till250 = Image("51till250.png", width = 14*cm, height = 7 * cm)
-plot_series(df_counts_trans['251 - 500'],df_counts_trans['501 - 1000'],df_counts_trans['1001 och mer'], filename = '251ochmer.png')
-diagram_251ochmer = Image("251ochmer.png", width = 14*cm, height = 7 * cm)
+plot_series(df_counts_trans['251 - 500'],df_counts_trans['501 - 1000'],df_counts_trans['1001 och mer'], filename = '251ochmer.png', title='Mörklila', xlabel='halvår', ylabel='Besök')
+diagram_251ochmer = Image("251ochmer.png", width = 14*cm, height = 8 * cm)
 
 halfyear_heading = Paragraph("Senaste 6 månadernas turfande", style_small_title)
 
 halfyeartext = f"Under de senaste 6 månadernas turfande gjordes totalt {takes_halfyear} besök vid {num_zones_halfyear} olika zoner. "
 halfyeartext = halfyeartext + f"Av dessa besök gjordes {takes_newzones} besök vid {num_zones_newzones} nya zoner. "
-halfyeartext = halfyeartext + f""
+halfyeartext = halfyeartext + f"Antalet besök i de nya zonerna kan vara något överskattad, om någon zon som bytt namn under det senaste halvåret har blivit besökt. \n"
 halfyear_paragraph = Paragraph(halfyeartext, style_normal)
 
 table_halfyear_data = [("Zon", "Besök")] + [(idx, val) for idx, val in top10_takes_last_six_months.items()]
