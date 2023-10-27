@@ -12,7 +12,7 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle, 
 
 from format_data import import_data, takes_data, plot_series
 
-file_list = ['takes201610', 'takes201704','takes201710', 'takes201804','takes201810', 'takes201904', 'takes201910', 'takes202004','takes202010', 'takes202104', 'takes202110', 'takes202204', 'takes202210', 'takes202304']
+file_list = ['takes201610', 'takes201704','takes201710', 'takes201804','takes201810', 'takes201904', 'takes201910', 'takes202004','takes202010', 'takes202104', 'takes202110', 'takes202204', 'takes202210', 'takes202304', 'takes202310']
 manad_lista = ["januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"]
 num_obs = len(file_list)
 artal = file_list[num_obs-1][5:9]
@@ -25,9 +25,15 @@ else:
     period_text = f"sommarhalvåret {artal}"
 
 df = import_data(file_list)
+print("df")
+print("========")
 print(df)
+print("")
 df_counts = takes_data(df)
+print("df_counts")
+print("=========")
 print(df_counts)
+print("")
 df_counts_trans = df_counts.transpose()
 
 
@@ -37,8 +43,10 @@ df_halfyear = df_halfyear.reset_index()
 df_halfyear = df_halfyear.rename(columns={'index': 'Zone'})
 df_halfyear = df_halfyear.set_index('Zone')
 
+print("Halfyear")
+print("========")
 print(df_halfyear)
-
+print("")
 for i in range(1,num_obs):
     halfyear_col_name = file_list[i]+'halfyear'
     df_halfyear[halfyear_col_name] = df_halfyear[file_list[i]]-df_halfyear[file_list[i-1]]
@@ -56,13 +64,20 @@ takes_newzones = takes_newzones - takes_changed
 
 #print(file_list[num_obs-1])
 #print(df_halfyear[file_list[num_obs-1]])
+print("df_filtered_2")
+print("=============")
 print(df_filtered_2)
+print("")
 
 top10_takes_last_six_months = df_halfyear[halfyear_col_name].nlargest(10).astype(int)
 top10_takes_total = df[file_list[num_obs-1]].nlargest(10).astype(int)
+top10_takes_new = df_filtered[halfyear_col_name].nlargest(10).astype(int)
 
 #print(top10_takes_last_six_months)
-print(df_filtered)
+print("num_zones_changed")
+print("==================")
+print(num_zones_changed)
+print("")
 
 # Create a PDF document with A4 size
 doc = SimpleDocTemplate("turfrapport.pdf", pagesize=A4)
@@ -119,6 +134,7 @@ if(top10_takes_last_six_months.index.values[0] == top10_takes_total.index.values
 else:
     introtext = introtext + f" Den totalt sett vanligaste zonen under turfkariären är {top10_takes_total.index.values[0]} med totalt {top10_takes_total[0]} besök."
 introtext = introtext + f" Totalt togs {nya_unika_t0} nya unika zoner under {period_text}, jämfört med {nya_unika_t1} under halvåret innan. "
+introtext = introtext + f" Den nya zon som togs flest gånger är {top10_takes_new.index.values[0]} med {top10_takes_new[0]} besök."
 intro_paragraph = Paragraph(introtext, style_normal)
 
 wardedfarger_heading = Paragraph("Wardedfärger", style_small_title)
@@ -129,7 +145,19 @@ wardedtext = wardedtext + "Ibland kan antalet zoner i en grupp minska, det beror
 wardedtext = wardedtext + ""
 warded_paragraph = Paragraph(wardedtext, style_normal)
 
-table_wardedfarger_data = [list(df_counts.columns)] + [list(row) for row in df_counts.values]
+df_wardedfarger = df_counts.iloc[:,-6:]
+#table_wardedfarger_data = [list(df_wardedfarger.columns)] + [list(row) for row in df_wardedfarger.values]
+#table_wardedfarger_data.insert(0, [''] + list(df_wardedfarger.rows))
+table_wardedfarger_data = [[index] + list(row) for index, row in df_wardedfarger.iterrows()]
+# Include the column names as the first row in the table data.
+table_wardedfarger_data.insert(0, [''] + list(df_wardedfarger.columns))
+
+print("df_wardedfarger")
+print(df_wardedfarger)
+print("")
+print(table_wardedfarger_data)
+print("")
+
 table_wardedfarger = Table(table_wardedfarger_data)
 # Add style to the table
 style = TableStyle([
@@ -137,20 +165,20 @@ style = TableStyle([
     ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
     ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
     ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-    ('FONTSIZE', (0, 0), (-1, 0), 14),
-    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+    ('FONTSIZE', (0, 0), (-1, 0), 10),
+    ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
     ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
     ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
     ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
     ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-    ('FONTSIZE', (0, 1), (-1, -1), 12),
-    ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+    ('FONTSIZE', (0, 1), (-1, -1), 9),
+    ('BOTTOMPADDING', (0, 1), (-1, -1), 3),
     ('BACKGROUND', (0, -1), (-1, -1), colors.grey),
     ('TEXTCOLOR', (0, -1), (-1, -1), colors.whitesmoke),
     ('ALIGN', (0, -1), (-1, -1), 'CENTER'),
     ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
-    ('FONTSIZE', (0, -1), (-1, -1), 14),
-    ('TOPPADDING', (0, -1), (-1, -1), 12),
+    ('FONTSIZE', (0, -1), (-1, -1), 10),
+    ('TOPPADDING', (0, -1), (-1, -1), 6),
 ])
 
 # Apply style to the table
@@ -167,17 +195,32 @@ halfyear_heading = Paragraph("Senaste 6 månadernas turfande", style_small_title
 
 halfyeartext = f"Under de senaste 6 månadernas turfande gjordes totalt {takes_halfyear} besök vid {num_zones_halfyear} olika zoner. "
 halfyeartext = halfyeartext + f"Av dessa besök gjordes {takes_newzones} besök vid {num_zones_newzones} nya zoner. "
-halfyeartext = halfyeartext + f"Antalet besök i de nya zonerna kan vara något överskattad, om någon zon som bytt namn under det senaste halvåret har blivit besökt. \n"
+halfyeartext = halfyeartext + f"Antalet besök i de nya zonerna kan vara något överskattad, om någon zon som bytt namn under det senaste halvåret har blivit besökt. \n\n"
 halfyear_paragraph = Paragraph(halfyeartext, style_normal)
 
 table_halfyear_data = [("Zon", "Besök")] + [(idx, val) for idx, val in top10_takes_last_six_months.items()]
 table_halfyear = Table(table_halfyear_data)
 table_halfyear.setStyle(style)
 
+newtext = f"Under de senaste sex månaderna har följande tio zoner tagits flest gånger."
+new_paragraph = Paragraph(newtext,style_normal)
+
+table_new_data = [("Zon", "Besök")] + [(idx, val) for idx, val in top10_takes_last_six_months.items()]
+table_new = Table(table_new_data)
+table_new.setStyle(style)
+
+
+totaltext = f"De zoner som tagits mest totalt"
+total_paragraph = Paragraph(totaltext,style_normal)
+
+table_total_data = [("Zon", "Besök")] + [(idx, val) for idx, val in top10_takes_total.items()]
+table_total = Table(table_total_data)
+table_total.setStyle(style)
+
 # Build the report content
 flowables = [heading, intro_paragraph, wardedfarger_heading, warded_paragraph, table_wardedfarger,
              diagram_2till50, diagram_51till250, diagram_251ochmer, halfyear_heading, halfyear_paragraph,
-             table_halfyear]
+             table_halfyear, new_paragraph, table_new, total_paragraph, table_total]
 
 # Set up the document and write the content
 doc.build(flowables)
