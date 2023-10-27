@@ -205,7 +205,7 @@ table_halfyear.setStyle(style)
 newtext = f"Under de senaste sex månaderna har följande tio zoner tagits flest gånger."
 new_paragraph = Paragraph(newtext,style_normal)
 
-table_new_data = [("Zon", "Besök")] + [(idx, val) for idx, val in top10_takes_last_six_months.items()]
+table_new_data = [("Zon", "Besök")] + [(idx, val) for idx, val in top10_takes_new.items()]
 table_new = Table(table_new_data)
 table_new.setStyle(style)
 
