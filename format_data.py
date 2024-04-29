@@ -8,10 +8,38 @@ def import_data(file_list):
 
     # loop through each file and read the data
     for file in file_list:
+        arman=file[5:11]
+        filechanges=f"data/changes{arman}.json"
+        #print(arman)
         with open(f"data/{file}.json") as f:
             data = json.load(f)
             counts = {f['properties']['title']: f['properties']['count'] for f in data['features']}
             data_dict[file] = counts
+        if(os.path.isfile(filechanges)):
+            with open(filechanges) as f:
+                changes = json.load(f)
+                for feature in changes['features']:
+                    for d in data_dict:
+                        #data_dict[d][feature['properties']['new_name']] = data_dict.pop([d][feature['properties']['old_name']])
+                        if(feature['properties']['old_name'] in data_dict[d]):
+                            print(f"old {d}: {data_dict[d][feature['properties']['old_name']]}")
+                            data_dict[d][feature['properties']['new_name']] = data_dict[d][feature['properties']['old_name']]
+                            del data_dict[d][feature['properties']['old_name']]
+                            print(f"new {d}: {data_dict[d][feature['properties']['new_name']]}")
+                    print(f"\n{file}\n==============\n")
+                    
+                    print("Oldname")
+                    print(f"{feature['properties']['old_name']}: {data_dict[file].get(feature['properties']['old_name'])}")
+                    print("Newname")
+                    print(f"{feature['properties']['new_name']}: {data_dict[file].get(feature['properties']['new_name'])}")
+                    #[print(v) for i, v in enumerate(data_dict.items()) if i < 5]
+                    #print(data_dict.get('takes201610'))
+                #print(f"Changes {arman}")
+                #print(data)
+
+    #for d in data_dict:
+    #    print(d)
+    #    print(data_dict[d])
 
     # create pandas dataframe
     df = pd.DataFrame.from_dict(data_dict, orient='columns')

@@ -1,0 +1,11 @@
+{
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Strandsbron",
+                "new_name": "Smalbron"
+            }
+        }
+    ]
+}

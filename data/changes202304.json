@@ -1,0 +1,33 @@
+
+{
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "L\u00e5ngaPer",
+                "new_name": "L\u00e5ngePer"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "G\u00e5nstaSp\u00e5ret",
+                "new_name": "G\u00e5nstasp\u00e5ret"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Stenfalkzon",
+                "new_name": "Stenfalken"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Bl\u00e5mandel",
+                "new_name": "Bl\u00e5Mandel"
+            }
+        }
+    ]
+}
