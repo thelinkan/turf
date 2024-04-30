@@ -6,12 +6,14 @@ import os
 def import_data(file_list):
     data_dict = {}
     turfdata_dict = {}
+    alla_dict = {}
 
     # loop through each file and read the data
     for file in file_list:
         arman=file[5:11]
         file_changes=f"data/changes{arman}.json"
         file_turfdata=f"data/turfdata{arman}.json"
+        file_allazoner = f"data/allazoner{arman}.json"
 
         #print(arman)
         with open(f"data/{file}.json") as f:
@@ -36,6 +38,16 @@ def import_data(file_list):
                 #print(turfdata)
                 turfdata_dict[f"data{arman}"]=turfdata
 
+        if(os.path.isfile(file_allazoner)):
+            with open(file_allazoner) as f:
+                allazoner = json.load(f)
+                alla_dict[f"period{arman}"]=allazoner
+                print(allazoner)
+
+    df_alla = pd.DataFrame.from_dict(alla_dict, orient='columns')
+
+    df_alla.to_excel("c:/temp/allazoner.xlsx")
+
 
 
     # create pandas dataframe
@@ -43,7 +55,7 @@ def import_data(file_list):
     df = df.fillna(0)
 
     df2 = pd.DataFrame.from_dict(turfdata_dict, orient='columns')
-    df2 = df2.fillna(0)
+    #df2 = df2.fillna(0)
 
     #print(df2)
 

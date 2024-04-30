@@ -27,6 +27,10 @@ else:
     period_text = f"sommarhalvåret {artal}"
 
 df,df_turfdata = import_data(file_list)
+
+pd.options.display.float_format = '{:,.0f}'.format
+
+
 print("df")
 print("========")
 print(df)
@@ -43,6 +47,7 @@ print(df_turfdata)
 print("")
 df_turfdata_trans = df_turfdata.transpose()
 
+df.to_excel("c:/temp/df.xlsx")
 
 
 df_halfyear = df
@@ -59,6 +64,9 @@ for i in range(1,num_obs):
     df_halfyear[halfyear_col_name] = df_halfyear[file_list[i]]-df_halfyear[file_list[i-1]]
 
 df_filtered = df_halfyear[(df_halfyear[file_list[num_obs-2]] == 0) & (df_halfyear.iloc[:, -1] > 0)][[df_halfyear.columns[-2], df_halfyear.columns[-1]]]
+num_zones_total = (df[df.columns[-1]] > 0).sum()
+takes_total =  int(df[df.columns[-1]].sum())
+
 num_zones_halfyear = (df_halfyear[df_halfyear.columns[-1]] > 0).sum()
 takes_halfyear =  int(df_halfyear[df_halfyear.columns[-1]].sum())
 num_zones_newzones = (df_filtered[df_halfyear.columns[-1]] > 0).sum()
@@ -98,7 +106,7 @@ style_small_title = styles['Heading2']
 
 
 # Create content for the report
-heading = Paragraph(f"Turfrapport {manad_lista[manad-1]} {artal}", style_title)
+heading = Paragraph(f"Turfrapport {turfname} {manad_lista[manad-1]} {artal}", style_title)
 zone_list = top10_takes_last_six_months.index.values
 #print(zone_list)
 
@@ -111,25 +119,25 @@ total_t0 = df_counts_trans['Totalt'][num_obs-1]
 gron_t0 =  df_counts_trans['1'][num_obs-1]
 gul_t0 =  df_counts_trans['2 - 10'][num_obs-1]
 orange_t0 = df_counts_trans['11 - 20'][num_obs-1]
-rod_t0 = df_counts_trans['11 - 20'][num_obs-1]
+rod_t0 = df_counts_trans['21 - 50'][num_obs-1]
 
 total_t1 = df_counts_trans['Totalt'][num_obs-2]
 gron_t1 =  df_counts_trans['1'][num_obs-2]
 gul_t1 =  df_counts_trans['2 - 10'][num_obs-2]
 orange_t1 = df_counts_trans['11 - 20'][num_obs-2]
-rod_t1 = df_counts_trans['11 - 20'][num_obs-2]
+rod_t1 = df_counts_trans['21 - 50'][num_obs-2]
 
 total_t2 = df_counts_trans['Totalt'][num_obs-3]
 gron_t2 =  df_counts_trans['1'][num_obs-3]
 gul_t2 =  df_counts_trans['2 - 10'][num_obs-3]
 orange_t2 = df_counts_trans['11 - 20'][num_obs-3]
-rod_t2 = df_counts_trans['11 - 20'][num_obs-3]
+rod_t2 = df_counts_trans['21 - 50'][num_obs-3]
 
 total_t3 = df_counts_trans['Totalt'][num_obs-4]
 gron_t3 =  df_counts_trans['1'][num_obs-4]
 gul_t3 =  df_counts_trans['2 - 10'][num_obs-4]
 orange_t3 = df_counts_trans['11 - 20'][num_obs-4]
-rod_t3 = df_counts_trans['11 - 20'][num_obs-4]
+rod_t3 = df_counts_trans['21 - 50'][num_obs-4]
 
 nya_unika_t0 = total_t0 - total_t1
 nya_unika_t1 = total_t1 - total_t2
@@ -137,11 +145,11 @@ nya_unika_t2 = total_t2 - total_t3
 
 num_obs_turfdata = df_turfdata_trans.shape[0]
 
-unika_turfare_t0 = df_turfdata_trans['uniqueturfers'][num_obs_turfdata-1]
-unika_assist_t0 = df_turfdata_trans['uniqueassists'][num_obs_turfdata-1]
+unika_turfare_t0 = int(df_turfdata_trans['uniqueturfers'][num_obs_turfdata-1])
+unika_assist_t0 = int(df_turfdata_trans['uniqueassists'][num_obs_turfdata-1])
 
-unika_turfare_t1 = df_turfdata_trans['uniqueturfers'][num_obs_turfdata-2]
-unika_assist_t1 = df_turfdata_trans['uniqueassists'][num_obs_turfdata-2]
+unika_turfare_t1 = int(df_turfdata_trans['uniqueturfers'][num_obs_turfdata-2])
+unika_assist_t1 = int(df_turfdata_trans['uniqueassists'][num_obs_turfdata-2])
 
 unika_turfare_t2 = df_turfdata_trans['uniqueturfers'][num_obs_turfdata-3]
 unika_assist_t2 = df_turfdata_trans['uniqueassists'][num_obs_turfdata-3]
@@ -151,13 +159,15 @@ nya_assist_t0 = unika_assist_t0 - unika_assist_t1
 nya_turfare_t1 = unika_turfare_t1 - unika_turfare_t2
 nya_assist_t1 = unika_assist_t1 - unika_assist_t2
 
-introtext = f"Under de senaste 6 månadernas turfande för {turfname} var {top10_takes_last_six_months.index.values[0]} den vanligaste zonen med {top10_takes_last_six_months[0]} besök. "
+introtext = f"{turfname} har gjort totalt {takes_total} takes i {num_zones_total} unika zoner. "
+
+introtext = introtext + f"Under de senaste 6 månadernas turfande för {turfname} var {top10_takes_last_six_months.index.values[0]} den vanligaste zonen med {top10_takes_last_six_months[0]} besök. "
 if(top10_takes_last_six_months.index.values[0] == top10_takes_total.index.values[0]):
     introtext = introtext + f" Även den totalt vanligaste zonen under turfkariären är {top10_takes_total.index.values[0]} med totalt {top10_takes_total[0]} besök."
 else:
     introtext = introtext + f" Den totalt sett vanligaste zonen under turfkariären är {top10_takes_total.index.values[0]} med totalt {top10_takes_total[0]} besök."
 introtext = introtext + f" Totalt togs {nya_unika_t0} nya unika zoner under {period_text}, jämfört med {nya_unika_t1} under halvåret innan. "
-introtext = introtext + f" Den nya zon som togs flest gånger är {top10_takes_new.index.values[0]} med {top10_takes_new[0]} besök.\n\n"
+introtext = introtext + f" Den nya zon som togs flest gånger under halvåret var {top10_takes_new.index.values[0]} med {top10_takes_new[0]} besök.\n\n"
 introtext = introtext + f" Totalt har zoner tagits från {unika_turfare_t0} olika turfare, en ökning med {nya_turfare_t0} under senaste halvåret."
 introtext = introtext.replace('\n','<br />\n')
 intro_paragraph = Paragraph(introtext, style_normal)
@@ -251,15 +261,20 @@ table_total.setStyle(style)
 
 interkationer_heading = Paragraph("Interaktioner", style_small_title)
 
-interaktionertext = f" Totalt har zoner tagits från {unika_turfare_t0} olika turfare, en ökning med {nya_turfare_t0} under {period_text}."
+interaktionertext = f" Totalt har zoner tagits från {unika_turfare_t0} olika turfare, varav {nya_turfare_t0} var nya unika turfare {period_text}."
 interaktionertext = interaktionertext + f" Under halvåret innan ökade antalet unika turfare med {nya_turfare_t1}."
 interaktionertext = interaktionertext + f" Antalet unika turfare som har assistats har ökat från {unika_assist_t1} till {unika_assist_t0}."
 
 interkationer_paragraph = Paragraph(interaktionertext,style_normal)
 
+plot_series(df_turfdata_trans['uniqueturfers'], filename = 'unikaturfare.png', title='Unika turfare', xlabel='halvår', ylabel='Antal')
+unikaturfare = Image("unikaturfare.png", width = 14*cm, height = 8 * cm)
+plot_series(df_turfdata_trans['uniqueassists'], filename = 'unikaassist.png', title='Unika assisterade turfare', xlabel='halvår', ylabel='Antal')
+unikaassist = Image("unikaassist.png", width = 14*cm, height = 8 * cm)
+
 # Build the report content
 flowables = [heading, intro_paragraph, wardedfarger_heading, warded_paragraph, table_wardedfarger,
-             diagram_2till50, diagram_51till250, diagram_251ochmer, interkationer_heading, interkationer_paragraph, halfyear_heading, halfyear_paragraph,
+             diagram_2till50, diagram_51till250, diagram_251ochmer, interkationer_heading, interkationer_paragraph, unikaturfare, unikaassist, halfyear_heading, halfyear_paragraph,
              table_halfyear, new_paragraph, table_new, total_paragraph, table_total]
 
 # Set up the document and write the content
