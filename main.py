@@ -35,7 +35,7 @@ print("df")
 print("========")
 print(df)
 print("")
-df_counts = takes_data(df)
+df_counts = takes_data(df.drop(['Country','Region','Takeovers'], axis=1))
 print("df_counts")
 print("=========")
 print(df_counts)
@@ -47,10 +47,10 @@ print(df_turfdata)
 print("")
 df_turfdata_trans = df_turfdata.transpose()
 
-df.to_excel("c:/temp/df.xlsx")
+#df.to_excel("c:/temp/df.xlsx")
 
 
-df_halfyear = df
+df_halfyear = df.drop(['Country','Region','Takeovers'], axis=1)
 df_halfyear = df_halfyear.reset_index()
 df_halfyear = df_halfyear.rename(columns={'index': 'Zone'})
 df_halfyear = df_halfyear.set_index('Zone')
@@ -71,9 +71,9 @@ num_zones_halfyear = (df_halfyear[df_halfyear.columns[-1]] > 0).sum()
 takes_halfyear =  int(df_halfyear[df_halfyear.columns[-1]].sum())
 num_zones_newzones = (df_filtered[df_halfyear.columns[-1]] > 0).sum()
 takes_newzones = int(df_filtered[df_halfyear.columns[-1]].sum())
-df_filtered_2 = df_halfyear[(df[file_list[num_obs-2]] > 0) & (df.iloc[:, -1] == 0)][[df.columns[-2], df.columns[-1]]]
-num_zones_changed = (df_filtered_2[df.columns[-2]] > 0).sum()
-takes_changed = int(df_filtered_2[df.columns[-1]].sum())
+df_filtered_2 = df_halfyear[(df[file_list[num_obs-5]] > 0) & (df.iloc[:, -4] == 0)][[df.columns[-5], df.columns[-4]]]
+num_zones_changed = (df_filtered_2[df_filtered_2.columns[-2]] > 0).sum()
+takes_changed = int(df_filtered_2[df_filtered_2.columns[-1]].sum())
 num_zones_newzones = num_zones_newzones - num_zones_changed
 takes_newzones = takes_newzones - takes_changed
 
@@ -82,6 +82,24 @@ takes_newzones = takes_newzones - takes_changed
 print("df_filtered_2")
 print("=============")
 print(df_filtered_2)
+print("")
+
+print("Countries and regions")
+print("=====================")
+dfa = df.loc[df[file_list[0]]>0]
+df_countries = pd.DataFrame.from_dict(dfa['Country'].value_counts())
+df_countries.rename(columns = {'count':file_list[0]}, inplace=True)
+
+for i in range(2,num_obs):
+    dfa = df.loc[df[file_list[i-1]]>0]
+    df_countries_b = pd.DataFrame.from_dict(dfa['Country'].value_counts())
+    df_countries_b.rename(columns = {'count':file_list[i-1]}, inplace=True)
+    df_countries = df_countries.join(df_countries_b)
+
+
+print(df_countries)
+print("")
+print(df['Region'].value_counts())
 print("")
 
 top10_takes_last_six_months = df_halfyear[halfyear_col_name].nlargest(10).astype(int)

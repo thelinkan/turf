@@ -13,7 +13,7 @@ def import_data(file_list):
         arman=file[5:11]
         file_changes=f"data/changes{arman}.json"
         file_turfdata=f"data/turfdata{arman}.json"
-        file_allazoner = f"data/allazoner{arman}.json"
+        file_allazoner = f"data/allzones{arman}.json"
 
         #print(arman)
         with open(f"data/{file}.json") as f:
@@ -38,28 +38,68 @@ def import_data(file_list):
                 #print(turfdata)
                 turfdata_dict[f"data{arman}"]=turfdata
 
+        print(file_allazoner)
         if(os.path.isfile(file_allazoner)):
-            with open(file_allazoner) as f:
+            with open(file_allazoner, encoding='utf-8') as f:
                 allazoner = json.load(f)
+              
                 alla_dict[f"period{arman}"]=allazoner
-                print(allazoner)
 
-    df_alla = pd.DataFrame.from_dict(alla_dict, orient='columns')
+                #print(allazoner)
 
-    df_alla.to_excel("c:/temp/allazoner.xlsx")
+    zone_name_list=[]
+    zone_takeovers_list=[]
+    zone_country_list=[]
+    zone_region_list=[]
+
+    for z in alla_dict[f"period{arman}"]:
+        zone_name = z['name']
+        zone_takeovers = z['totalTakeovers']
+        if 'region' in z:
+            if 'country' in z['region']:
+                zone_country = z['region']['country']
+            else:
+                zone_country = "None"
+            zone_region = z['region']['name']
+        else:
+            zone_country = "None"
+            zone_region = "None"
+        zone_name_list.append(zone_name)
+        zone_takeovers_list.append(zone_takeovers)
+        zone_country_list.append(zone_country)
+        zone_region_list.append(zone_region)
+        #print(f"{zone_name} - {zone_takeovers} - {zone_country} - {zone_region}")
+        
+        
+
+    df_alla = pd.DataFrame({'Zone':zone_name_list, 'Country': zone_country_list, 'Region': zone_region_list, 'Takeovers': zone_takeovers_list})
+    
+    
+    #df_halfyear = df_halfyear.reset_index()
+    #df_halfyear = df_halfyear.rename(columns={'index': 'Zone'})
+    df_alla = df_alla.set_index('Zone')
+    del zone_name_list, zone_country_list, zone_region_list, zone_takeovers_list
+
+    #df_alla = pd.DataFrame.from_dict(alla_dict, orient='columns')
+
+    #df_alla.to_excel("c:/temp/allazoner.xlsx")
 
 
 
     # create pandas dataframe
     df = pd.DataFrame.from_dict(data_dict, orient='columns')
     df = df.fillna(0)
+    df_allt = df.join(df_alla)
+    #df_allt.to_excel("c:/temp/takes.xlsx")
+
+
 
     df2 = pd.DataFrame.from_dict(turfdata_dict, orient='columns')
     #df2 = df2.fillna(0)
 
     #print(df2)
 
-    return df,df2
+    return df_allt,df2
     
 def takes_data(df):
     counts = {}
