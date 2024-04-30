@@ -1,0 +1,11 @@
+{
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "UmeStation",
+                "new_name": "Ume\u00e5C"
+            }
+        }
+    ]
+}

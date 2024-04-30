@@ -1,0 +1,18 @@
+{
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "SkolparkZone",
+                "new_name": "DrWesterlund"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "F?v\u00e1mT\u00e9r",
+                "new_name": "Fov\u00e1mT\u00e9r"
+            }
+        }
+    ]
+}

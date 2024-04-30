@@ -199,7 +199,7 @@ halfyeartext = f"Under de senaste 6 månadernas turfande gjordes totalt {takes_h
 halfyeartext = halfyeartext + f"Av dessa besök gjordes {takes_newzones} besök vid {num_zones_newzones} nya zoner. \n\n "
 if(num_zones_changed>0):
     halfyeartext = halfyeartext + f"Antalet besök i de nya zonerna kan vara något överskattad, då {num_zones_changed} zoner antingen har bytt "
-    halfyeartext = halfyeartext + f"namn under det senaste halvåret eller tagits bort utan att det kunnat korrigeras för."
+    halfyeartext = halfyeartext + f"namn under det senaste halvåret eller tagits bort utan att det kunnat korrigeras för. "
 
 halfyeartext = halfyeartext + f"Under de senaste sex månaderna har följande tio zoner tagits flest gånger. \n\n"
 halfyeartext=halfyeartext.replace('\n','<br />\n')

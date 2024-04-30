@@ -1,0 +1,32 @@
+{
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "PalmeZone",
+                "new_name": "BrantingZone"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "EnaAlle",
+                "new_name": "EnaAll\u00e9"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Djurg\u00e5rdsbro",
+                "new_name": "Djurg\u00e5rdsbron"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Fov\u00e1mT\u00e9r",
+                "new_name": "F\u0151v\u00e1mT\u00e9r"
+            }
+        }
+    ]
+}

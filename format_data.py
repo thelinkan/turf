@@ -15,12 +15,12 @@ def import_data(file_list):
             data = json.load(f)
             counts = {f['properties']['title']: f['properties']['count'] for f in data['features']}
             data_dict[file] = counts
+        # apply changes to zone names
         if(os.path.isfile(filechanges)):
             with open(filechanges) as f:
                 changes = json.load(f)
                 for feature in changes['features']:
                     for d in data_dict:
-                        #data_dict[d][feature['properties']['new_name']] = data_dict.pop([d][feature['properties']['old_name']])
                         if(feature['properties']['old_name'] in data_dict[d]):
                             print(f"old {d}: {data_dict[d][feature['properties']['old_name']]}")
                             data_dict[d][feature['properties']['new_name']] = data_dict[d][feature['properties']['old_name']]
@@ -32,31 +32,10 @@ def import_data(file_list):
                     print(f"{feature['properties']['old_name']}: {data_dict[file].get(feature['properties']['old_name'])}")
                     print("Newname")
                     print(f"{feature['properties']['new_name']}: {data_dict[file].get(feature['properties']['new_name'])}")
-                    #[print(v) for i, v in enumerate(data_dict.items()) if i < 5]
-                    #print(data_dict.get('takes201610'))
-                #print(f"Changes {arman}")
-                #print(data)
-
-    #for d in data_dict:
-    #    print(d)
-    #    print(data_dict[d])
 
     # create pandas dataframe
     df = pd.DataFrame.from_dict(data_dict, orient='columns')
     df = df.fillna(0)
-
-    # apply changes to zone names
-    for file in os.listdir('data'):
-        if file.startswith('changes') and file.endswith('.json'):
-            with open(f"data/{file}") as f:
-                changes = json.load(f)
-                print(changes)
-                for feature in changes['features']:
-                    old_name = feature['properties']['old_name']
-                    new_name = feature['properties']['new_name']
-                    for col in df.columns:
-                        if old_name in df.index:
-                            df.rename(index={old_name: new_name}, inplace=True)
 
     return df
     

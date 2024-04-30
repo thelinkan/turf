@@ -1,0 +1,25 @@
+{
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "TfCentralbroN",
+                "new_name": "CentralbroN"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Huvudstatorg",
+                "new_name": "HuvudstaTorg"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "G\u00f6taBroZone",
+                "new_name": "Hisingsbron"
+            }
+        }
+    ]
+}

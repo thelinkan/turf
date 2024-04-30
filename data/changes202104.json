@@ -1,0 +1,25 @@
+{
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Lillbrozone",
+                "new_name": "LillbroZone"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Ekelundzone",
+                "new_name": "EkelundZone"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Saltsj\u00f6rampen",
+                "new_name": "Guldbron"
+            }
+        }
+    ]
+}

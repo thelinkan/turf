@@ -1,0 +1,11 @@
+{
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Zonbron",
+                "new_name": "InteRopaHej"
+            }
+        }
+    ]
+}

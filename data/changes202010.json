@@ -1,0 +1,67 @@
+{
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Fenceway",
+                "new_name": "FenceWay"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Headzone",
+                "new_name": "HeadZone"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Tabyzone",
+                "new_name": "T\u00e4byZone"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "ApoteksPark",
+                "new_name": "Apotekspark"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "EldshZone",
+                "new_name": "EldhsZone"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Islandsquare",
+                "new_name": "IslandSquare"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Cleverforrest",
+                "new_name": "CleverForest"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Osquarzone",
+                "new_name": "OsquarZone"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Lootlake",
+                "new_name": "LootLake"
+            }
+        }
+    ]
+}

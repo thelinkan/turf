@@ -1,0 +1,25 @@
+{
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "KarlasAlle",
+                "new_name": "KarlasAll\u00e9"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Policezone",
+                "new_name": "PoliceZone"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "CentralbroN",
+                "new_name": "TfCentralbroN"
+            }
+        }
+    ]
+}
