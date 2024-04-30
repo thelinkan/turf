@@ -26,7 +26,7 @@ if manad == 4:
 else:
     period_text = f"sommarhalvåret {artal}"
 
-df = import_data(file_list)
+df,df_turfdata = import_data(file_list)
 print("df")
 print("========")
 print(df)
@@ -37,6 +37,11 @@ print("=========")
 print(df_counts)
 print("")
 df_counts_trans = df_counts.transpose()
+print("df_turfdata")
+print("=========")
+print(df_turfdata)
+print("")
+df_turfdata_trans = df_turfdata.transpose()
 
 
 
@@ -130,13 +135,31 @@ nya_unika_t0 = total_t0 - total_t1
 nya_unika_t1 = total_t1 - total_t2
 nya_unika_t2 = total_t2 - total_t3
 
+num_obs_turfdata = df_turfdata_trans.shape[0]
+
+unika_turfare_t0 = df_turfdata_trans['uniqueturfers'][num_obs_turfdata-1]
+unika_assist_t0 = df_turfdata_trans['uniqueassists'][num_obs_turfdata-1]
+
+unika_turfare_t1 = df_turfdata_trans['uniqueturfers'][num_obs_turfdata-2]
+unika_assist_t1 = df_turfdata_trans['uniqueassists'][num_obs_turfdata-2]
+
+unika_turfare_t2 = df_turfdata_trans['uniqueturfers'][num_obs_turfdata-3]
+unika_assist_t2 = df_turfdata_trans['uniqueassists'][num_obs_turfdata-3]
+
+nya_turfare_t0 = unika_turfare_t0 - unika_turfare_t1
+nya_assist_t0 = unika_assist_t0 - unika_assist_t1
+nya_turfare_t1 = unika_turfare_t1 - unika_turfare_t2
+nya_assist_t1 = unika_assist_t1 - unika_assist_t2
+
 introtext = f"Under de senaste 6 månadernas turfande för {turfname} var {top10_takes_last_six_months.index.values[0]} den vanligaste zonen med {top10_takes_last_six_months[0]} besök. "
 if(top10_takes_last_six_months.index.values[0] == top10_takes_total.index.values[0]):
     introtext = introtext + f" Även den totalt vanligaste zonen under turfkariären är {top10_takes_total.index.values[0]} med totalt {top10_takes_total[0]} besök."
 else:
     introtext = introtext + f" Den totalt sett vanligaste zonen under turfkariären är {top10_takes_total.index.values[0]} med totalt {top10_takes_total[0]} besök."
 introtext = introtext + f" Totalt togs {nya_unika_t0} nya unika zoner under {period_text}, jämfört med {nya_unika_t1} under halvåret innan. "
-introtext = introtext + f" Den nya zon som togs flest gånger är {top10_takes_new.index.values[0]} med {top10_takes_new[0]} besök."
+introtext = introtext + f" Den nya zon som togs flest gånger är {top10_takes_new.index.values[0]} med {top10_takes_new[0]} besök.\n\n"
+introtext = introtext + f" Totalt har zoner tagits från {unika_turfare_t0} olika turfare, en ökning med {nya_turfare_t0} under senaste halvåret."
+introtext = introtext.replace('\n','<br />\n')
 intro_paragraph = Paragraph(introtext, style_normal)
 
 wardedfarger_heading = Paragraph("Wardedfärger", style_small_title)
@@ -144,7 +167,8 @@ wardedfarger_heading = Paragraph("Wardedfärger", style_small_title)
 wardedtext = "I detta avsnitt kommer information om hur många zoner som har respektive wardedfärg. "
 wardedtext = wardedtext + "Förutom de vanliga färgerna grön, gul, röd och lila, så har de lila zonerna delats upp i 51-100, 101-250, 251-500, 501-1000 och 1001+. "
 wardedtext = wardedtext + "Ibland kan antalet zoner i en grupp minska, det beror på att fler zoner har flyttats upp en nivå, än som har tillkommit i den aktuella nivån. "
-wardedtext = wardedtext + ""
+wardedtext = wardedtext + "\n\n"
+wardedtext = wardedtext.replace('\n','<br />\n')
 warded_paragraph = Paragraph(wardedtext, style_normal)
 
 df_wardedfarger = df_counts.iloc[:,-6:]
@@ -218,16 +242,24 @@ table_new = Table(table_new_data)
 table_new.setStyle(style)
 
 
-totaltext = f"De 10 zoner som tagits mest totalt"
+totaltext = f"De 10 zoner som tagits mest totalt är"
 total_paragraph = Paragraph(totaltext,style_normal)
 
 table_total_data = [("Zon", "Besök")] + [(idx, val) for idx, val in top10_takes_total.items()]
 table_total = Table(table_total_data)
 table_total.setStyle(style)
 
+interkationer_heading = Paragraph("Interaktioner", style_small_title)
+
+interaktionertext = f" Totalt har zoner tagits från {unika_turfare_t0} olika turfare, en ökning med {nya_turfare_t0} under {period_text}."
+interaktionertext = interaktionertext + f" Under halvåret innan ökade antalet unika turfare med {nya_turfare_t1}."
+interaktionertext = interaktionertext + f" Antalet unika turfare som har assistats har ökat från {unika_assist_t1} till {unika_assist_t0}."
+
+interkationer_paragraph = Paragraph(interaktionertext,style_normal)
+
 # Build the report content
 flowables = [heading, intro_paragraph, wardedfarger_heading, warded_paragraph, table_wardedfarger,
-             diagram_2till50, diagram_51till250, diagram_251ochmer, halfyear_heading, halfyear_paragraph,
+             diagram_2till50, diagram_51till250, diagram_251ochmer, interkationer_heading, interkationer_paragraph, halfyear_heading, halfyear_paragraph,
              table_halfyear, new_paragraph, table_new, total_paragraph, table_total]
 
 # Set up the document and write the content

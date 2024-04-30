@@ -3,8 +3,22 @@
         {
             "type": "Feature",
             "properties": {
+                "old_name": "DuvboToppen",
+                "new_name": "Duvbotoppen"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
                 "old_name": "Strandsbron",
                 "new_name": "Smalbron"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "VegaVallen",
+                "new_name": "Vegavallen"
             }
         }
     ]

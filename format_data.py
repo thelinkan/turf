@@ -5,39 +5,49 @@ import os
 
 def import_data(file_list):
     data_dict = {}
+    turfdata_dict = {}
 
     # loop through each file and read the data
     for file in file_list:
         arman=file[5:11]
-        filechanges=f"data/changes{arman}.json"
+        file_changes=f"data/changes{arman}.json"
+        file_turfdata=f"data/turfdata{arman}.json"
+
         #print(arman)
         with open(f"data/{file}.json") as f:
             data = json.load(f)
             counts = {f['properties']['title']: f['properties']['count'] for f in data['features']}
             data_dict[file] = counts
         # apply changes to zone names
-        if(os.path.isfile(filechanges)):
-            with open(filechanges) as f:
+        if(os.path.isfile(file_changes)):
+            with open(file_changes) as f:
                 changes = json.load(f)
                 for feature in changes['features']:
                     for d in data_dict:
                         if(feature['properties']['old_name'] in data_dict[d]):
-                            print(f"old {d}: {data_dict[d][feature['properties']['old_name']]}")
+                            #print(f"old {d}: {data_dict[d][feature['properties']['old_name']]}")
                             data_dict[d][feature['properties']['new_name']] = data_dict[d][feature['properties']['old_name']]
                             del data_dict[d][feature['properties']['old_name']]
-                            print(f"new {d}: {data_dict[d][feature['properties']['new_name']]}")
-                    print(f"\n{file}\n==============\n")
-                    
-                    print("Oldname")
-                    print(f"{feature['properties']['old_name']}: {data_dict[file].get(feature['properties']['old_name'])}")
-                    print("Newname")
-                    print(f"{feature['properties']['new_name']}: {data_dict[file].get(feature['properties']['new_name'])}")
+                            #print(f"new {d}: {data_dict[d][feature['properties']['new_name']]}")
+
+        if(os.path.isfile(file_turfdata)):
+            with open(file_turfdata) as f:
+                turfdata = json.load(f)
+                #print(turfdata)
+                turfdata_dict[f"data{arman}"]=turfdata
+
+
 
     # create pandas dataframe
     df = pd.DataFrame.from_dict(data_dict, orient='columns')
     df = df.fillna(0)
 
-    return df
+    df2 = pd.DataFrame.from_dict(turfdata_dict, orient='columns')
+    df2 = df2.fillna(0)
+
+    #print(df2)
+
+    return df,df2
     
 def takes_data(df):
     counts = {}
