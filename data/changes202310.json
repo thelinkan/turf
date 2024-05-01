@@ -6,6 +6,13 @@
                 "old_name": "UmeStation",
                 "new_name": "Ume\u00e5C"
             }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "MarmorKirken",
+                "new_name": "Marmorkirken"
+            }
         }
     ]
 }

@@ -6,6 +6,20 @@
                 "old_name": "Zonbron",
                 "new_name": "InteRopaHej"
             }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "NyhavnsBroen",
+                "new_name": "Nyhavnsbroen"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "ChristianBorg",
+                "new_name": "Christianborg"
+            }
         }
     ]
 }

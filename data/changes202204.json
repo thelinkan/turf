@@ -6,6 +6,13 @@
                 "old_name": "KungKarlsStra",
                 "new_name": "Kungsholm"
             }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "HavneBadet",
+                "new_name": "Havnebadet"
+            }
         }
     ]
 }

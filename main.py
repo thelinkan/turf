@@ -47,7 +47,7 @@ print(df_turfdata)
 print("")
 df_turfdata_trans = df_turfdata.transpose()
 
-#df.to_excel("c:/temp/df.xlsx")
+df.to_excel("c:/temp/df.xlsx")
 
 
 df_halfyear = df.drop(['Country','Region','Takeovers'], axis=1)
@@ -96,11 +96,31 @@ for i in range(2,num_obs):
     df_countries_b.rename(columns = {'count':file_list[i-1]}, inplace=True)
     df_countries = df_countries.join(df_countries_b)
 
-
 print(df_countries)
 print("")
-print(df['Region'].value_counts())
+
+
+
+#dfa = df.loc[df[file_list[0]]>0]
+df_regions = pd.DataFrame.from_dict(df['Region'].value_counts())
+df_regions.rename(columns = {'count':'Total'}, inplace=True)
+
+for i in range(1,num_obs+1):
+    dfa = df.loc[df[file_list[i-1]]>0]
+    df_regions_b = pd.DataFrame.from_dict(dfa['Region'].value_counts())
+    df_regions_b.rename(columns = {'count':file_list[i-1]}, inplace=True)
+    df_regions = df_regions.join(df_regions_b)
+    #print(f"{i}: {file_list[i-1]}")
+
+df_regions = df_regions.fillna(0)
+
+df_halfyear_regions = df_regions
+for i in range(1,num_obs):
+    halfyear_col_name = file_list[i]+'halfyear'
+    df_halfyear_regions[halfyear_col_name] = df_halfyear_regions[file_list[i]]-df_halfyear_regions[file_list[i-1]]
+print(df_regions)
 print("")
+print(df_halfyear_regions)
 
 top10_takes_last_six_months = df_halfyear[halfyear_col_name].nlargest(10).astype(int)
 top10_takes_total = df[file_list[num_obs-1]].nlargest(10).astype(int)
