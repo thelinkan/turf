@@ -26,7 +26,7 @@ if manad == 4:
 else:
     period_text = f"sommarhalvåret {artal}"
 
-df,df_turfdata = import_data(file_list)
+df,df_turfdata, df_zones = import_data(file_list)
 
 pd.options.display.float_format = '{:,.0f}'.format
 
@@ -55,6 +55,7 @@ df_halfyear = df_halfyear.reset_index()
 df_halfyear = df_halfyear.rename(columns={'index': 'Zone'})
 df_halfyear = df_halfyear.set_index('Zone')
 
+df_halfyear = df_zones.join(df_halfyear)
 print("Halfyear")
 print("========")
 print(df_halfyear)
@@ -64,8 +65,8 @@ for i in range(1,num_obs):
     df_halfyear[halfyear_col_name] = df_halfyear[file_list[i]]-df_halfyear[file_list[i-1]]
 
 df_filtered = df_halfyear[(df_halfyear[file_list[num_obs-2]] == 0) & (df_halfyear.iloc[:, -1] > 0)][[df_halfyear.columns[-2], df_halfyear.columns[-1]]]
-num_zones_total = (df[df.columns[-1]] > 0).sum()
-takes_total =  int(df[df.columns[-1]].sum())
+num_zones_total = (df[df.columns[-4]] > 0).sum()
+takes_total =  int(df[df.columns[-4]].sum())
 
 num_zones_halfyear = (df_halfyear[df_halfyear.columns[-1]] > 0).sum()
 takes_halfyear =  int(df_halfyear[df_halfyear.columns[-1]].sum())
@@ -108,7 +109,7 @@ df_regions.rename(columns = {'count':'Total'}, inplace=True)
 for i in range(1,num_obs+1):
     dfa = df.loc[df[file_list[i-1]]>0]
     df_regions_b = pd.DataFrame.from_dict(dfa['Region'].value_counts())
-    df_regions_b.rename(columns = {'count':file_list[i-1]}, inplace=True)
+    df_regions_b.rename(columns = {'count':f'zones{file_list[i-1][5:]}'}, inplace=True)
     df_regions = df_regions.join(df_regions_b)
     #print(f"{i}: {file_list[i-1]}")
 
@@ -116,15 +117,27 @@ df_regions = df_regions.fillna(0)
 
 df_halfyear_regions = df_regions
 for i in range(1,num_obs):
-    halfyear_col_name = file_list[i]+'halfyear'
-    df_halfyear_regions[halfyear_col_name] = df_halfyear_regions[file_list[i]]-df_halfyear_regions[file_list[i-1]]
+    total_col_name = f'zones{file_list[i-1][5:]}'
+    total_col_name_prev = f'zones{file_list[i-2][5:]}'
+    halfyear_col_name = f'zones{file_list[i-1][5:]}halfyear'
+    df_halfyear_regions[halfyear_col_name] = df_halfyear_regions[total_col_name]-df_halfyear_regions[total_col_name_prev]
 print(df_regions)
 print("")
 print(df_halfyear_regions)
 
+df_halfyear_regions.to_excel("c:/temp/df_halfyear_regions.xlsx")
+df_regions.to_excel("c:/temp/df_regions.xlsx")
+num_regions_total = (df_regions[total_col_name] > 0).sum()
+num_regions_halfyear = (df_halfyear_regions[df_halfyear_regions.columns[-1]] > 0).sum()
+num_regions_halfyear_prev = (df_halfyear_regions[df_halfyear_regions.columns[-2]] > 0).sum()
+
+halfyear_col_name = file_list[num_obs-1]+'halfyear'
 top10_takes_last_six_months = df_halfyear[halfyear_col_name].nlargest(10).astype(int)
 top10_takes_total = df[file_list[num_obs-1]].nlargest(10).astype(int)
 top10_takes_new = df_filtered[halfyear_col_name].nlargest(10).astype(int)
+
+print(df_halfyear[['Region','takes202404halfyear']])
+
 
 #print(top10_takes_last_six_months)
 print("num_zones_changed")
@@ -185,19 +198,23 @@ num_obs_turfdata = df_turfdata_trans.shape[0]
 
 unika_turfare_t0 = int(df_turfdata_trans['uniqueturfers'][num_obs_turfdata-1])
 unika_assist_t0 = int(df_turfdata_trans['uniqueassists'][num_obs_turfdata-1])
+ftt_t0 = int(df_turfdata_trans['ftt'][num_obs_turfdata-1])
 
 unika_turfare_t1 = int(df_turfdata_trans['uniqueturfers'][num_obs_turfdata-2])
 unika_assist_t1 = int(df_turfdata_trans['uniqueassists'][num_obs_turfdata-2])
+ftt_t1 = int(df_turfdata_trans['ftt'][num_obs_turfdata-2])
 
 unika_turfare_t2 = df_turfdata_trans['uniqueturfers'][num_obs_turfdata-3]
 unika_assist_t2 = df_turfdata_trans['uniqueassists'][num_obs_turfdata-3]
+ftt_t3 = int(df_turfdata_trans['ftt'][num_obs_turfdata-3])
 
 nya_turfare_t0 = unika_turfare_t0 - unika_turfare_t1
 nya_assist_t0 = unika_assist_t0 - unika_assist_t1
+nya_ftt_t0 = ftt_t0 - ftt_t1
 nya_turfare_t1 = unika_turfare_t1 - unika_turfare_t2
 nya_assist_t1 = unika_assist_t1 - unika_assist_t2
 
-introtext = f"{turfname} har gjort totalt {takes_total} takes i {num_zones_total} unika zoner. "
+introtext = f"{turfname} har gjort totalt {takes_total} takes i {num_zones_total} unika zoner i {num_regions_total} olika regioner. "
 
 introtext = introtext + f"Under de senaste 6 månadernas turfande för {turfname} var {top10_takes_last_six_months.index.values[0]} den vanligaste zonen med {top10_takes_last_six_months[0]} besök. "
 if(top10_takes_last_six_months.index.values[0] == top10_takes_total.index.values[0]):
@@ -267,15 +284,20 @@ diagram_251ochmer = Image("251ochmer.png", width = 14*cm, height = 8 * cm)
 
 halfyear_heading = Paragraph("Senaste 6 månadernas turfande", style_small_title)
 
-halfyeartext = f"Under de senaste 6 månadernas turfande gjordes totalt {takes_halfyear} besök vid {num_zones_halfyear} olika zoner. "
-halfyeartext = halfyeartext + f"Av dessa besök gjordes {takes_newzones} besök vid {num_zones_newzones} nya zoner. \n\n "
+halfyeartext = f"Under de senaste 6 månadernas turfande gjordes totalt {takes_halfyear} besök vid {num_zones_halfyear} olika zoner i {num_regions_halfyear} olika regioner. "
+halfyeartext = halfyeartext + f"Av dessa besök gjordes {takes_newzones} besök vid {num_zones_newzones} nya zoner. "
+
+if nya_ftt_t0>0:
+    halfyeartext = halfyeartext + f" Du lyckades vara den första turfaren att ta {nya_ftt_t0} zoner (så kallad ftt).\n\n "
+else:
+    halfyeartext = halfyeartext + f" Du lyckades inte vara den första turfaren att ta några zoner det senaste halvåret. \n\n"
+
 if(num_zones_changed>0):
     halfyeartext = halfyeartext + f"Antalet besök i de nya zonerna kan vara något överskattad, då {num_zones_changed} zoner antingen har bytt "
     halfyeartext = halfyeartext + f"namn under det senaste halvåret eller tagits bort utan att det kunnat korrigeras för. "
 
 halfyeartext = halfyeartext + f"Under de senaste sex månaderna har följande tio zoner tagits flest gånger. \n\n"
 halfyeartext=halfyeartext.replace('\n','<br />\n')
-print(halfyeartext)
 halfyear_paragraph = Paragraph(halfyeartext, style_normal)
 
 table_halfyear_data = [("Zon", "Besök")] + [(idx, val) for idx, val in top10_takes_last_six_months.items()]
