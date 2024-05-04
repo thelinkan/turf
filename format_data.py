@@ -38,7 +38,6 @@ def import_data(file_list):
                 #print(turfdata)
                 turfdata_dict[f"data{arman}"]=turfdata
 
-        print(file_allazoner)
         if(os.path.isfile(file_allazoner)):
             with open(file_allazoner, encoding='utf-8') as f:
                 allazoner = json.load(f)
@@ -102,16 +101,17 @@ def import_data(file_list):
     df = pd.DataFrame.from_dict(data_dict, orient='columns')
     df = df.fillna(0)
     df_allt = df.join(df_alla)
-    #df_allt.to_excel("c:/temp/takes.xlsx")
+    df_allt.to_excel("c:/temp/takes.xlsx")
 
-
+    df_zones = df_allt[['Country', 'Region', 'Takeovers']]
+    df_zones.to_excel("c:/temp/zones.xlsx")
 
     df2 = pd.DataFrame.from_dict(turfdata_dict, orient='columns')
     #df2 = df2.fillna(0)
 
     #print(df2)
 
-    return df_allt,df2
+    return df_allt, df2, df_zones
     
 def takes_data(df):
     counts = {}
