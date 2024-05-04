@@ -65,8 +65,8 @@ for i in range(1,num_obs):
     df_halfyear[halfyear_col_name] = df_halfyear[file_list[i]]-df_halfyear[file_list[i-1]]
 
 df_filtered = df_halfyear[(df_halfyear[file_list[num_obs-2]] == 0) & (df_halfyear.iloc[:, -1] > 0)][[df_halfyear.columns[-2], df_halfyear.columns[-1]]]
-num_zones_total = (df[df.columns[-4]] > 0).sum()
-takes_total =  int(df[df.columns[-4]].sum())
+num_zones_total = (df[df.columns[-6]] > 0).sum()
+takes_total =  int(df[df.columns[-6]].sum())
 
 num_zones_halfyear = (df_halfyear[df_halfyear.columns[-1]] > 0).sum()
 takes_halfyear =  int(df_halfyear[df_halfyear.columns[-1]].sum())
