@@ -13,7 +13,7 @@ def import_data(file_list):
         arman=file[5:11]
         file_changes=f"data/changes{arman}.json"
         file_turfdata=f"data/turfdata{arman}.json"
-        file_allazoner = f"data/allzones{arman}.json"
+        file_allazoner = f"data/allzonesv5{arman}.json"
 
         #print(arman)
         with open(f"data/{file}.json") as f:
@@ -51,11 +51,17 @@ def import_data(file_list):
     zone_takeovers_list=[]
     zone_country_list=[]
     zone_region_list=[]
+    zone_area_list=[]
+    zone_type_list=[]
 
     for z in alla_dict[f"period{arman}"]:
         zone_name = z['name']
         zone_takeovers = z['totalTakeovers']
         if 'region' in z:
+            if 'area' in z['region']:
+                zone_area = z['region']['area']['name']
+            else:
+                zone_area = "None"
             if 'country' in z['region']:
                 zone_country = z['region']['country']
             else:
@@ -64,21 +70,27 @@ def import_data(file_list):
         else:
             zone_country = "None"
             zone_region = "None"
+        if 'type' in z:
+            zone_type = z['type']['name']
+        else:
+            zone_type = "None"
         zone_name_list.append(zone_name)
         zone_takeovers_list.append(zone_takeovers)
         zone_country_list.append(zone_country)
         zone_region_list.append(zone_region)
+        zone_area_list.append(zone_area)
+        zone_type_list.append(zone_type)
         #print(f"{zone_name} - {zone_takeovers} - {zone_country} - {zone_region}")
         
         
 
-    df_alla = pd.DataFrame({'Zone':zone_name_list, 'Country': zone_country_list, 'Region': zone_region_list, 'Takeovers': zone_takeovers_list})
+    df_alla = pd.DataFrame({'Zone':zone_name_list, 'Country': zone_country_list, 'Region': zone_region_list, 'Area': zone_area_list, 'Type': zone_type_list, 'Takeovers': zone_takeovers_list})
     
     
     #df_halfyear = df_halfyear.reset_index()
     #df_halfyear = df_halfyear.rename(columns={'index': 'Zone'})
     df_alla = df_alla.set_index('Zone')
-    del zone_name_list, zone_country_list, zone_region_list, zone_takeovers_list
+    del zone_name_list, zone_country_list, zone_region_list, zone_takeovers_list, zone_area_list, zone_type_list
 
     #df_alla = pd.DataFrame.from_dict(alla_dict, orient='columns')
 

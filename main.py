@@ -35,7 +35,7 @@ print("df")
 print("========")
 print(df)
 print("")
-df_counts = takes_data(df.drop(['Country','Region','Takeovers'], axis=1))
+df_counts = takes_data(df.drop(['Country','Region','Area','Type','Takeovers'], axis=1))
 print("df_counts")
 print("=========")
 print(df_counts)
@@ -50,7 +50,7 @@ df_turfdata_trans = df_turfdata.transpose()
 df.to_excel("c:/temp/df.xlsx")
 
 
-df_halfyear = df.drop(['Country','Region','Takeovers'], axis=1)
+df_halfyear = df.drop(['Country','Region','Area','Type','Takeovers'], axis=1)
 df_halfyear = df_halfyear.reset_index()
 df_halfyear = df_halfyear.rename(columns={'index': 'Zone'})
 df_halfyear = df_halfyear.set_index('Zone')
@@ -71,7 +71,7 @@ num_zones_halfyear = (df_halfyear[df_halfyear.columns[-1]] > 0).sum()
 takes_halfyear =  int(df_halfyear[df_halfyear.columns[-1]].sum())
 num_zones_newzones = (df_filtered[df_halfyear.columns[-1]] > 0).sum()
 takes_newzones = int(df_filtered[df_halfyear.columns[-1]].sum())
-df_filtered_2 = df_halfyear[(df[file_list[num_obs-5]] > 0) & (df.iloc[:, -4] == 0)][[df.columns[-5], df.columns[-4]]]
+df_filtered_2 = df_halfyear[(df[file_list[num_obs-7]] > 0) & (df.iloc[:, -6] == 0)][[df.columns[-7], df.columns[-6]]]
 num_zones_changed = (df_filtered_2[df_filtered_2.columns[-2]] > 0).sum()
 takes_changed = int(df_filtered_2[df_filtered_2.columns[-1]].sum())
 num_zones_newzones = num_zones_newzones - num_zones_changed
@@ -114,13 +114,30 @@ for i in range(1,num_obs+1):
 
 df_regions = df_regions.fillna(0)
 
+df_areas = pd.DataFrame.from_dict(df['Area'].value_counts())
+df_areas.rename(columns = {'count':'Total'}, inplace=True)
+
+for i in range(1,num_obs+1):
+    dfa = df.loc[df[file_list[i-1]]>0]
+    df_areas_b = pd.DataFrame.from_dict(dfa['Area'].value_counts())
+    df_areas_b.rename(columns = {'count':file_list[i-1]}, inplace=True)
+    df_areas = df_areas.join(df_areas_b)
+    #print(f"{i}: {file_list[i-1]}")
+
+df_areas = df_areas.fillna(0)
+
+#print(df_areas)
+
 df_halfyear_regions = df_regions
+df_halfyear_areas = df_areas
 for i in range(1,num_obs):
     halfyear_col_name = file_list[i]+'halfyear'
     df_halfyear_regions[halfyear_col_name] = df_halfyear_regions[file_list[i]]-df_halfyear_regions[file_list[i-1]]
+    df_halfyear_areas[halfyear_col_name] = df_halfyear_areas[file_list[i]]-df_halfyear_areas[file_list[i-1]]
 print(df_regions)
 print("")
 print(df_halfyear_regions)
+print(df_halfyear_areas)
 
 top10_takes_last_six_months = df_halfyear[halfyear_col_name].nlargest(10).astype(int)
 top10_takes_total = df[file_list[num_obs-1]].nlargest(10).astype(int)
