@@ -121,7 +121,7 @@ df_areas.rename(columns = {'count':'Total'}, inplace=True)
 for i in range(1,num_obs+1):
     dfa = df.loc[df[file_list[i-1]]>0]
     df_areas_b = pd.DataFrame.from_dict(dfa['Area'].value_counts())
-    df_areas_b.rename(columns = {'count':file_list[i-1]}, inplace=True)
+    df_areas_b.rename(columns = {'count':f'zones{file_list[i-1][5:]}'}, inplace=True)
     df_areas = df_areas.join(df_areas_b)
     #print(f"{i}: {file_list[i-1]}")
 
@@ -136,7 +136,7 @@ for i in range(1,num_obs):
     total_col_name_prev = f'zones{file_list[i-2][5:]}'
     halfyear_col_name = f'zones{file_list[i-1][5:]}halfyear'
     df_halfyear_regions[halfyear_col_name] = df_halfyear_regions[total_col_name]-df_halfyear_regions[total_col_name_prev]
-    df_halfyear_areas[halfyear_col_name] = df_halfyear_areas[file_list[i]]-df_halfyear_areas[file_list[i-1]]
+    df_halfyear_areas[halfyear_col_name] = df_halfyear_areas[total_col_name]-df_halfyear_areas[total_col_name_prev]
 print(df_regions)
 print("")
 print(df_halfyear_regions)
@@ -146,6 +146,11 @@ df_regions.to_excel("c:/temp/df_regions.xlsx")
 num_regions_total = (df_regions[total_col_name] > 0).sum()
 num_regions_halfyear = (df_halfyear_regions[df_halfyear_regions.columns[-1]] > 0).sum()
 num_regions_halfyear_prev = (df_halfyear_regions[df_halfyear_regions.columns[-2]] > 0).sum()
+
+num_areas_total = (df_areas[total_col_name] > 0).sum()
+num_areas_halfyear = (df_halfyear_areas[df_halfyear_areas.columns[-1]] > 0).sum()
+num_areas_halfyear_prev = (df_halfyear_areas[df_halfyear_areas.columns[-2]] > 0).sum()
+
 
 halfyear_col_name = file_list[num_obs-1]+'halfyear'
 top10_takes_last_six_months = df_halfyear[halfyear_col_name].nlargest(10).astype(int)
@@ -300,7 +305,7 @@ diagram_251ochmer = Image("251ochmer.png", width = 14*cm, height = 8 * cm)
 
 halfyear_heading = Paragraph("Senaste 6 månadernas turfande", style_small_title)
 
-halfyeartext = f"Under de senaste 6 månadernas turfande gjordes totalt {takes_halfyear} besök vid {num_zones_halfyear} olika zoner i {num_regions_halfyear} olika regioner. "
+halfyeartext = f"Under de senaste 6 månadernas turfande gjordes totalt {takes_halfyear} besök vid {num_zones_halfyear} olika zoner i {num_regions_halfyear} olika regioner och {num_areas_halfyear} olika areor (motsvarande kommuner). "
 halfyeartext = halfyeartext + f"Av dessa besök gjordes {takes_newzones} besök vid {num_zones_newzones} nya zoner. "
 
 if nya_ftt_t0>0:
