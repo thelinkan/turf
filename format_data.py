@@ -91,10 +91,12 @@ def import_data(file_list):
     df_alla = df_alla.set_index('Zone')
     del zone_name_list, zone_country_list, zone_region_list, zone_takeovers_list, zone_area_list, zone_type_list
 
-    #df_alla = pd.DataFrame.from_dict(alla_dict, orient='columns')
-
     #df_alla.to_excel("c:/temp/allazoner.xlsx")
 
+    df_sverige = df_alla[(df_alla['Country']=='se')]
+    df_sverige_areas = pd.DataFrame.from_dict(df_sverige['Area'].value_counts())
+    df_sverige_areas.rename(columns = {'count':'Antal zoner'}, inplace=True)
+    #df_sverige_areas.to_excel("c:/temp/sverigeareas.xlsx")
 
 
     # create pandas dataframe
@@ -103,7 +105,7 @@ def import_data(file_list):
     df_allt = df.join(df_alla)
     df_allt.to_excel("c:/temp/takes.xlsx")
 
-    df_zones = df_allt[['Country', 'Region', 'Takeovers']]
+    df_zones = df_allt[['Country', 'Region', 'Area', 'Type', 'Takeovers']]
     df_zones.to_excel("c:/temp/zones.xlsx")
 
     df2 = pd.DataFrame.from_dict(turfdata_dict, orient='columns')
@@ -111,7 +113,7 @@ def import_data(file_list):
 
     #print(df2)
 
-    return df_allt, df2, df_zones
+    return df_allt, df2, df_zones, df_sverige_areas
     
 def takes_data(df):
     counts = {}

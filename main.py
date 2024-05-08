@@ -26,7 +26,7 @@ if manad == 4:
 else:
     period_text = f"sommarhalvåret {artal}"
 
-df,df_turfdata, df_zones = import_data(file_list)
+df,df_turfdata, df_zones, df_sverige_areas = import_data(file_list)
 
 pd.options.display.float_format = '{:,.0f}'.format
 
@@ -40,7 +40,13 @@ print("df_counts")
 print("=========")
 print(df_counts)
 print("")
+
 df_counts_trans = df_counts.transpose()
+df_counts_trans['Nya'] = df_counts_trans['Totalt'].diff(1)
+print(df_counts_trans)
+print("")
+
+
 print("df_turfdata")
 print("=========")
 print(df_turfdata)
@@ -127,13 +133,39 @@ for i in range(1,num_obs+1):
 
 df_areas = df_areas.fillna(0)
 
-#print(df_areas)
+total_col_name = f'takes{file_list[num_obs-1][5:]}'
+df_sverige = df[(df[total_col_name] > 0)]
+df_sverige_areas_own = pd.DataFrame.from_dict(df_sverige['Area'].value_counts())
+df_sverige_areas_own.rename(columns = {'count':'Besökta zoner'}, inplace=True)
+df_sverige_areas = df_sverige_areas.join(df_sverige_areas_own)
+df_sverige_areas['Procent'] = (100 * df_sverige_areas['Besökta zoner']/df_sverige_areas['Antal zoner']).round(2)
+df_sverige_areas =df_sverige_areas.sort_values('Procent', ascending=False)
+
+num_sv_areas_100 = df_sverige_areas.loc[df_sverige_areas['Besökta zoner'] == df_sverige_areas['Antal zoner']].count()['Procent']
+num_sv_areas_80_100 =df_sverige_areas.loc[df_sverige_areas['Procent']>=80].count()['Procent']
+num_sv_areas_50_80 =df_sverige_areas.loc[df_sverige_areas['Procent']>=50].count()['Procent']
+num_sv_areas_25_50 =df_sverige_areas.loc[df_sverige_areas['Procent']>=25].count()['Procent']
+
+num_sv_areas_25_50 = num_sv_areas_25_50 - num_sv_areas_50_80
+num_sv_areas_50_80 = num_sv_areas_50_80 - num_sv_areas_80_100
+num_sv_areas_80_100 = num_sv_areas_80_100 - num_sv_areas_100
+
+print("df_sverige_areas")
+print("================")
+print(df_sverige_areas)
+#df_sverige_areas_own = df_turfdata['']
+
+print(f"100% - {num_sv_areas_100}")
+print(f"80% - 100% - {num_sv_areas_80_100}")
+print(f"50% - 80% - {num_sv_areas_50_80}")
+print(f"25% - 50% - {num_sv_areas_25_50}")
 
 df_halfyear_regions = df_regions
 df_halfyear_areas = df_areas
 for i in range(1,num_obs):
     total_col_name = f'zones{file_list[i-1][5:]}'
     total_col_name_prev = f'zones{file_list[i-2][5:]}'
+    total_col_name_2prev = f'zones{file_list[i-3][5:]}'
     halfyear_col_name = f'zones{file_list[i-1][5:]}halfyear'
     df_halfyear_regions[halfyear_col_name] = df_halfyear_regions[total_col_name]-df_halfyear_regions[total_col_name_prev]
     df_halfyear_areas[halfyear_col_name] = df_halfyear_areas[total_col_name]-df_halfyear_areas[total_col_name_prev]
@@ -144,6 +176,10 @@ print(df_halfyear_regions)
 df_halfyear_regions.to_excel("c:/temp/df_halfyear_regions.xlsx")
 df_regions.to_excel("c:/temp/df_regions.xlsx")
 num_regions_total = (df_regions[total_col_name] > 0).sum()
+num_regions_total_prev = (df_regions[total_col_name_prev] > 0).sum()
+num_regions_total_2prev = (df_regions[total_col_name_2prev] > 0).sum()
+num_regions_new = num_regions_total - num_regions_total_prev
+num_regions_2new = num_regions_total_prev - num_regions_total_2prev
 num_regions_halfyear = (df_halfyear_regions[df_halfyear_regions.columns[-1]] > 0).sum()
 num_regions_halfyear_prev = (df_halfyear_regions[df_halfyear_regions.columns[-2]] > 0).sum()
 
@@ -235,8 +271,9 @@ nya_ftt_t0 = ftt_t0 - ftt_t1
 nya_turfare_t1 = unika_turfare_t1 - unika_turfare_t2
 nya_assist_t1 = unika_assist_t1 - unika_assist_t2
 
-introtext = f"{turfname} har gjort totalt {takes_total} takes i {num_zones_total} unika zoner i {num_regions_total} olika regioner. "
+print(f" {num_regions_total} - {num_regions_total_prev} - {num_regions_total_2prev}")
 
+introtext = f"{turfname} har gjort totalt {takes_total} takes i {num_zones_total} unika zoner i {num_regions_total} olika regioner. "
 introtext = introtext + f"Under de senaste 6 månadernas turfande för {turfname} var {top10_takes_last_six_months.index.values[0]} den vanligaste zonen med {top10_takes_last_six_months[0]} besök. "
 if(top10_takes_last_six_months.index.values[0] == top10_takes_total.index.values[0]):
     introtext = introtext + f" Även den totalt vanligaste zonen under turfkariären är {top10_takes_total.index.values[0]} med totalt {top10_takes_total[0]} besök."
@@ -244,7 +281,23 @@ else:
     introtext = introtext + f" Den totalt sett vanligaste zonen under turfkariären är {top10_takes_total.index.values[0]} med totalt {top10_takes_total[0]} besök."
 introtext = introtext + f" Totalt togs {nya_unika_t0} nya unika zoner under {period_text}, jämfört med {nya_unika_t1} under halvåret innan. "
 introtext = introtext + f" Den nya zon som togs flest gånger under halvåret var {top10_takes_new.index.values[0]} med {top10_takes_new[0]} besök.\n\n"
-introtext = introtext + f" Totalt har zoner tagits från {unika_turfare_t0} olika turfare, en ökning med {nya_turfare_t0} under senaste halvåret."
+introtext = introtext + f" Totalt har zoner tagits från {unika_turfare_t0} olika turfare, en ökning med {nya_turfare_t0} under senaste halvåret.\n\n"
+if(num_sv_areas_100>0):
+    if (num_sv_areas_100 == 1):
+        text_kommun = "kommun"
+    else:
+        text_kommun = "kommuner"
+    introtext = introtext + f" {turfname} har besökt alla zoner i {num_sv_areas_100} {text_kommun}."
+else:
+    if (num_sv_areas_80_100 == 1):
+        text_kommun = "kommun"
+    else:
+        text_kommun = "kommuner"
+    introtext = introtext + f" {turfname} har förnäravarande inte besökt alla zoner i någon kommun. " 
+    introtext = introtext + f" Däremot har han besökt minst 80 procent av zonerna i {num_sv_areas_80_100} {text_kommun}." 
+
+
+
 introtext = introtext.replace('\n','<br />\n')
 intro_paragraph = Paragraph(introtext, style_normal)
 
@@ -306,7 +359,15 @@ diagram_251ochmer = Image("251ochmer.png", width = 14*cm, height = 8 * cm)
 halfyear_heading = Paragraph("Senaste 6 månadernas turfande", style_small_title)
 
 halfyeartext = f"Under de senaste 6 månadernas turfande gjordes totalt {takes_halfyear} besök vid {num_zones_halfyear} olika zoner i {num_regions_halfyear} olika regioner och {num_areas_halfyear} olika areor (motsvarande kommuner). "
-halfyeartext = halfyeartext + f"Av dessa besök gjordes {takes_newzones} besök vid {num_zones_newzones} nya zoner. "
+if num_regions_new>0:
+    if num_regions_2new>0:
+        halfyeartext = halfyeartext + f" {num_regions_new} av dessa regioner var helt nya, jämfört med {num_regions_2new} föregående halvår. "
+    else:
+        halfyeartext = halfyeartext + f" {num_regions_new} av dessa regioner var helt nya. "
+else:
+    if num_regions_2new>0:
+        halfyeartext = halfyeartext + f" Det var inga nya regioner det senaste halvåret, men {num_regions_2new} var nya föregående halvår. "
+halfyeartext = halfyeartext + f"Av besöken detta halvår gjordes totalt {takes_newzones} besök vid {num_zones_newzones} nya zoner. "
 
 if nya_ftt_t0>0:
     halfyeartext = halfyeartext + f" Du lyckades vara den första turfaren att ta {nya_ftt_t0} zoner (så kallad ftt).\n\n "
@@ -324,6 +385,10 @@ halfyear_paragraph = Paragraph(halfyeartext, style_normal)
 table_halfyear_data = [("Zon", "Besök")] + [(idx, val) for idx, val in top10_takes_last_six_months.items()]
 table_halfyear = Table(table_halfyear_data)
 table_halfyear.setStyle(style)
+
+plot_series(df_counts_trans['Nya'], filename = 'nyazoner.png', title='Nya unika zoner', xlabel='halvår', ylabel='Antal')
+diagram_nyazoner = Image("nyazoner.png", width = 14*cm, height = 7 * cm)
+
 
 newtext = f"Under de senaste sex månaderna har följande tio nya zoner tagits flest gånger. \n\n"
 new_paragraph = Paragraph(newtext,style_normal)
@@ -356,7 +421,7 @@ unikaassist = Image("unikaassist.png", width = 14*cm, height = 8 * cm)
 # Build the report content
 flowables = [heading, intro_paragraph, wardedfarger_heading, warded_paragraph, table_wardedfarger,
              diagram_2till50, diagram_51till250, diagram_251ochmer, interkationer_heading, interkationer_paragraph, unikaturfare, unikaassist, halfyear_heading, halfyear_paragraph,
-             table_halfyear, new_paragraph, table_new, total_paragraph, table_total]
+             table_halfyear, diagram_nyazoner, new_paragraph, table_new, total_paragraph, table_total]
 
 # Set up the document and write the content
 doc.build(flowables)
