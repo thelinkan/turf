@@ -78,6 +78,7 @@ num_zones_halfyear = (df_halfyear[df_halfyear.columns[-1]] > 0).sum()
 takes_halfyear =  int(df_halfyear[df_halfyear.columns[-1]].sum())
 num_zones_newzones = (df_filtered[df_halfyear.columns[-1]] > 0).sum()
 takes_newzones = int(df_filtered[df_halfyear.columns[-1]].sum())
+#takes_newzones_prev2 = int(df_filtered[df_halfyear.columns[-3]].sum())
 df_filtered_2 = df_halfyear[(df[file_list[num_obs-7]] > 0) & (df.iloc[:, -6] == 0)][[df.columns[-7], df.columns[-6]]]
 num_zones_changed = (df_filtered_2[df_filtered_2.columns[-2]] > 0).sum()
 takes_changed = int(df_filtered_2[df_filtered_2.columns[-1]].sum())
@@ -193,7 +194,13 @@ top10_takes_last_six_months = df_halfyear[halfyear_col_name].nlargest(10).astype
 top10_takes_total = df[file_list[num_obs-1]].nlargest(10).astype(int)
 top10_takes_new = df_filtered[halfyear_col_name].nlargest(10).astype(int)
 
-print(df_halfyear[['Region','takes202404halfyear']])
+halfyear_col_name = file_list[num_obs-2]+'halfyear'
+#top10_takes_last_six_months = pd.DataFrame(top10_takes_last_six_months).join(df_halfyear[halfyear_col_name])
+print("top 10")
+print("======")
+print(top10_takes_last_six_months)
+
+#print(df_halfyear[['Region','takes202404halfyear']])
 
 
 #print(top10_takes_last_six_months)
@@ -293,7 +300,7 @@ else:
         text_kommun = "kommun"
     else:
         text_kommun = "kommuner"
-    introtext = introtext + f" {turfname} har förnäravarande inte besökt alla zoner i någon kommun. " 
+    introtext = introtext + f" {turfname} har för näravarande inte besökt alla zoner i någon kommun. " 
     introtext = introtext + f" Däremot har han besökt minst 80 procent av zonerna i {num_sv_areas_80_100} {text_kommun}." 
 
 
@@ -368,6 +375,8 @@ else:
     if num_regions_2new>0:
         halfyeartext = halfyeartext + f" Det var inga nya regioner det senaste halvåret, men {num_regions_2new} var nya föregående halvår. "
 halfyeartext = halfyeartext + f"Av besöken detta halvår gjordes totalt {takes_newzones} besök vid {num_zones_newzones} nya zoner. "
+#halfyeartext = halfyeartext + f"Motsvarande halvår för ett år sedan var det {takes_newzones_prev2} besök vid {num_zones_newzones} nya zoner. "
+
 
 if nya_ftt_t0>0:
     halfyeartext = halfyeartext + f" Du lyckades vara den första turfaren att ta {nya_ftt_t0} zoner (så kallad ftt).\n\n "
