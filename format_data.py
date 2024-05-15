@@ -166,3 +166,35 @@ def plot_series(*series, filename = 'file.png' , title='Line Plot', xlabel='X-ax
     #plt.show()
     
     return plt
+
+def plot_stacked_series(*series, filename = 'file.png' , title='Line Plot', xlabel='X-axis', ylabel='Y-axis'):
+    """
+    Creates a line plot for each of the given series on the same figure.
+
+    Parameters:
+    *series (pandas.Series): Tuple of pandas.Series objects.
+    title (str): Title for the plot.
+    xlabel (str): Label for the x-axis.
+    ylabel (str): Label for the y-axis.
+    """
+    # Create a line plot for each series
+    #for s in series:
+    print(series)
+    plt.stackplot(series)
+
+    # Add title and axis labels
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.xticks(rotation=45)
+
+    # Add legend
+    plt.legend()
+    plt.savefig(filename, dpi=300)
+    plt.close()
+    
+    
+    # Display the plot
+    plt.show()
+    
+    return plt

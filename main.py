@@ -10,7 +10,8 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.enums import TA_CENTER
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle, Image
 
-from format_data import import_data, takes_data, plot_series
+from format_data import import_data, takes_data, plot_series, plot_stacked_series
+from console_output import print_df
 
 turfname='TheLinkan'
 
@@ -26,31 +27,20 @@ if manad == 4:
 else:
     period_text = f"sommarhalvåret {artal}"
 
+# Importera data 
 df,df_turfdata, df_zones, df_sverige_areas = import_data(file_list)
 
 pd.options.display.float_format = '{:,.0f}'.format
 
-
-print("df")
-print("========")
-print(df)
-print("")
+print_df(df,"Main df")
 df_counts = takes_data(df.drop(['Country','Region','Area','Type','Takeovers'], axis=1))
-print("df_counts")
-print("=========")
-print(df_counts)
-print("")
+print_df(df_counts,"df_counts")
 
 df_counts_trans = df_counts.transpose()
 df_counts_trans['Nya'] = df_counts_trans['Totalt'].diff(1)
-print(df_counts_trans)
-print("")
+print_df(df_counts_trans,"df_counts_trans")
 
-
-print("df_turfdata")
-print("=========")
-print(df_turfdata)
-print("")
+print_df(df_turfdata,"df_turfdata")
 df_turfdata_trans = df_turfdata.transpose()
 
 df.to_excel("c:/temp/df.xlsx")
@@ -62,10 +52,8 @@ df_halfyear = df_halfyear.rename(columns={'index': 'Zone'})
 df_halfyear = df_halfyear.set_index('Zone')
 
 df_halfyear = df_zones.join(df_halfyear)
-print("Halfyear")
-print("========")
-print(df_halfyear)
-print("")
+print_df(df_halfyear,"df_halfyear")
+
 for i in range(1,num_obs):
     halfyear_col_name = file_list[i]+'halfyear'
     df_halfyear[halfyear_col_name] = df_halfyear[file_list[i]]-df_halfyear[file_list[i-1]]
@@ -85,15 +73,10 @@ takes_changed = int(df_filtered_2[df_filtered_2.columns[-1]].sum())
 num_zones_newzones = num_zones_newzones - num_zones_changed
 takes_newzones = takes_newzones - takes_changed
 
-#print(file_list[num_obs-1])
-#print(df_halfyear[file_list[num_obs-1]])
-print("df_filtered_2")
-print("=============")
-print(df_filtered_2)
-print("")
+print_df(df_filtered_2,"df_filtered_2")
 
-print("Countries and regions")
-print("=====================")
+
+# Länder och regioner
 dfa = df.loc[df[file_list[0]]>0]
 df_countries = pd.DataFrame.from_dict(dfa['Country'].value_counts())
 df_countries.rename(columns = {'count':file_list[0]}, inplace=True)
@@ -104,10 +87,7 @@ for i in range(2,num_obs):
     df_countries_b.rename(columns = {'count':file_list[i-1]}, inplace=True)
     df_countries = df_countries.join(df_countries_b)
 
-print(df_countries)
-print("")
-
-
+print_df(df_countries,"df_countries")
 
 #dfa = df.loc[df[file_list[0]]>0]
 df_regions = pd.DataFrame.from_dict(df['Region'].value_counts())
@@ -151,10 +131,7 @@ num_sv_areas_25_50 = num_sv_areas_25_50 - num_sv_areas_50_80
 num_sv_areas_50_80 = num_sv_areas_50_80 - num_sv_areas_80_100
 num_sv_areas_80_100 = num_sv_areas_80_100 - num_sv_areas_100
 
-print("df_sverige_areas")
-print("================")
-print(df_sverige_areas)
-#df_sverige_areas_own = df_turfdata['']
+print_df(df_sverige_areas,"df_sverige_areas")
 
 print(f"100% - {num_sv_areas_100}")
 print(f"80% - 100% - {num_sv_areas_80_100}")
@@ -164,15 +141,16 @@ print(f"25% - 50% - {num_sv_areas_25_50}")
 df_halfyear_regions = df_regions
 df_halfyear_areas = df_areas
 for i in range(1,num_obs):
-    total_col_name = f'zones{file_list[i-1][5:]}'
-    total_col_name_prev = f'zones{file_list[i-2][5:]}'
-    total_col_name_2prev = f'zones{file_list[i-3][5:]}'
-    halfyear_col_name = f'zones{file_list[i-1][5:]}halfyear'
+    total_col_name = f'zones{file_list[i][5:]}'
+    total_col_name_prev = f'zones{file_list[i-1][5:]}'
+    total_col_name_2prev = f'zones{file_list[i-2][5:]}'
+    halfyear_col_name = f'zones{file_list[i][5:]}halfyear'
     df_halfyear_regions[halfyear_col_name] = df_halfyear_regions[total_col_name]-df_halfyear_regions[total_col_name_prev]
     df_halfyear_areas[halfyear_col_name] = df_halfyear_areas[total_col_name]-df_halfyear_areas[total_col_name_prev]
-print(df_regions)
-print("")
-print(df_halfyear_regions)
+
+print_df(df_regions,"df_regions")
+
+print_df(df_halfyear_regions,"df_halfyear_regions")
 
 df_halfyear_regions.to_excel("c:/temp/df_halfyear_regions.xlsx")
 df_regions.to_excel("c:/temp/df_regions.xlsx")
@@ -196,18 +174,9 @@ top10_takes_new = df_filtered[halfyear_col_name].nlargest(10).astype(int)
 
 halfyear_col_name = file_list[num_obs-2]+'halfyear'
 #top10_takes_last_six_months = pd.DataFrame(top10_takes_last_six_months).join(df_halfyear[halfyear_col_name])
-print("top 10")
-print("======")
-print(top10_takes_last_six_months)
+print_df(top10_takes_last_six_months,"top10_takes_last_six_months")
 
-#print(df_halfyear[['Region','takes202404halfyear']])
-
-
-#print(top10_takes_last_six_months)
-print("num_zones_changed")
-print("==================")
-print(num_zones_changed)
-print("")
+print_df(num_zones_changed,"num_zones_changed")
 
 # Create a PDF document with A4 size
 doc = SimpleDocTemplate("turfrapport.pdf", pagesize=A4)
@@ -292,16 +261,25 @@ introtext = introtext + f" Totalt har zoner tagits från {unika_turfare_t0} olik
 if(num_sv_areas_100>0):
     if (num_sv_areas_100 == 1):
         text_kommun = "kommun"
+        text_svensk = "svensk"
     else:
         text_kommun = "kommuner"
-    introtext = introtext + f" {turfname} har besökt alla zoner i {num_sv_areas_100} {text_kommun}."
+        text_svensk = "svenska"
+    if (num_sv_areas_80_100 == 1):
+        text_kommun_80 = "kommun"
+    else:
+        text_kommun_80 = "kommuner"
+    introtext = introtext + f" {turfname} har besökt alla zoner i {num_sv_areas_100} {text_svensk} {text_kommun}."
+    introtext = introtext + f" Därutöver har han besökt minst 80 procent av zonerna i {num_sv_areas_80_100} {text_kommun_80} och " 
+    introtext = introtext + f" minst 50 procent av zonerna (men mindre än 80 procent) i {num_sv_areas_50_80} kommuner. " 
 else:
     if (num_sv_areas_80_100 == 1):
         text_kommun = "kommun"
     else:
         text_kommun = "kommuner"
-    introtext = introtext + f" {turfname} har för näravarande inte besökt alla zoner i någon kommun. " 
-    introtext = introtext + f" Däremot har han besökt minst 80 procent av zonerna i {num_sv_areas_80_100} {text_kommun}." 
+    introtext = introtext + f" {turfname} har för näravarande inte besökt alla zoner i svensk någon kommun. " 
+    introtext = introtext + f" Däremot har han besökt minst 80 procent av zonerna i {num_sv_areas_80_100} {text_kommun}. " 
+    introtext = introtext + f" Därutöver har han besökt minst 50 procent av zonerna (men mindre än 80 procent) i {num_sv_areas_50_80} kommuner. " 
 
 
 
