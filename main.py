@@ -390,9 +390,10 @@ else:
 
 if(num_zones_changed>0):
     halfyeartext = halfyeartext + f"Antalet besök i de nya zonerna kan vara något överskattad, då {num_zones_changed} zoner antingen har bytt "
-    halfyeartext = halfyeartext + f"namn under det senaste halvåret eller tagits bort utan att det kunnat korrigeras för. "
+    halfyeartext = halfyeartext + f"namn under det senaste halvåret eller tagits bort utan att det kunnat korrigeras för. \n\n"
 
-halfyeartext = halfyeartext + f"Under de senaste sex månaderna har följande tio zoner tagits flest gånger. \n\n"
+halfyeartext = halfyeartext + f"Tabellen nedan visar hur många gånger {turfname} besökt var och en av de tio zoner som besökts mest under de senaste sex månaderna,"
+halfyeartext = halfyeartext + f"samt hur många besök som gjorts i respektive zon de föregående sex månaderna. \n\n"
 halfyeartext=halfyeartext.replace('\n','<br />\n')
 halfyear_paragraph = Paragraph(halfyeartext, style_normal)
 
