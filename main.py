@@ -12,8 +12,13 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle, 
 
 from format_data import import_data, takes_data, plot_series, plot_stacked_series
 from console_output import print_df
+from report_text import create_introtext
+from turf_data import TurfData
 
 turfname='TheLinkan'
+
+turfdata = TurfData(turfname)
+print(turfdata.turfname)
 
 file_list = ['takes201610', 'takes201704','takes201710', 'takes201804','takes201810', 'takes201904', 'takes201910', 'takes202004','takes202010', 'takes202104', 'takes202110', 'takes202204', 'takes202210', 'takes202304', 'takes202310', 'takes202404']
 manad_lista = ["januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"]
@@ -33,20 +38,25 @@ else:
 # Importera data 
 df,df_turfdata, df_zones, df_sverige_areas = import_data(file_list)
 
+turfdata.set_main_dfs(df,df_turfdata, df_zones, df_sverige_areas, file_list)
+
 pd.options.display.float_format = '{:,.0f}'.format
 
-print_df(df,"Main df")
+print_df(turfdata.df_takes,"Main df")
 df_counts = takes_data(df.drop(['Country','Region','Area','Type','Takeovers'], axis=1))
-print_df(df_counts,"df_counts")
+turfdata.set_df_count_takes(df_counts)
+print_df(turfdata.df_count_takes,"df_counts")
 
-df_counts_trans = df_counts.transpose()
-df_counts_trans['Nya'] = df_counts_trans['Totalt'].diff(1)
-print_df(df_counts_trans,"df_counts_trans")
+#df_counts_trans = df_counts.transpose()
+#df_counts_trans['Nya'] = df_counts_trans['Totalt'].diff(1)
+#print_df(df_counts_trans,"df_counts_trans")
+print_df(turfdata.df_count_takes_trans,"df_counts_trans - class")
+
 
 print_df(df_turfdata,"df_turfdata")
 df_turfdata_trans = df_turfdata.transpose()
 
-df.to_excel("c:/temp/df.xlsx")
+turfdata.df_takes.to_excel("c:/temp/df.xlsx")
 
 
 df_halfyear = df.drop(['Country','Region','Area','Type','Takeovers'], axis=1)
@@ -56,6 +66,8 @@ df_halfyear = df_halfyear.set_index('Zone')
 
 df_halfyear = df_zones.join(df_halfyear)
 print_df(df_halfyear,"df_halfyear")
+
+print_df(turfdata.df_takes_halfyear,"df_halfyear - class")
 
 for i in range(1,num_obs):
     halfyear_col_name = file_list[i]+'halfyear'
@@ -80,6 +92,8 @@ print_df(df_filtered_2,"df_filtered_2")
 
 
 # Länder och regioner
+turfdata.create_df_countries_regions(file_list)
+
 dfa = df.loc[df[file_list[0]]>0]
 df_countries = pd.DataFrame.from_dict(dfa['Country'].value_counts())
 df_countries.rename(columns = {'count':file_list[0]}, inplace=True)
@@ -90,7 +104,7 @@ for i in range(2,num_obs):
     df_countries_b.rename(columns = {'count':file_list[i-1]}, inplace=True)
     df_countries = df_countries.join(df_countries_b)
 
-print_df(df_countries,"df_countries")
+print_df(turfdata.df_countries,"df_countries")
 
 #dfa = df.loc[df[file_list[0]]>0]
 df_regions = pd.DataFrame.from_dict(df['Region'].value_counts())
@@ -204,29 +218,29 @@ zone_list = top10_takes_last_six_months.index.values
 #    zone_name = df[df['takes202210halfyear']==top10_takes_last_six_months[0]].index[0]
 #else:
 #    zone_name = ""
-total_t0 = df_counts_trans['Totalt'][num_obs-1]
-gron_t0 =  df_counts_trans['1'][num_obs-1]
-gul_t0 =  df_counts_trans['2 - 10'][num_obs-1]
-orange_t0 = df_counts_trans['11 - 20'][num_obs-1]
-rod_t0 = df_counts_trans['21 - 50'][num_obs-1]
+total_t0 = turfdata.df_count_takes_trans['Totalt'][num_obs-1]
+gron_t0 =  turfdata.df_count_takes_trans['1'][num_obs-1]
+gul_t0 =  turfdata.df_count_takes_trans['2 - 10'][num_obs-1]
+orange_t0 = turfdata.df_count_takes_trans['11 - 20'][num_obs-1]
+rod_t0 = turfdata.df_count_takes_trans['21 - 50'][num_obs-1]
 
-total_t1 = df_counts_trans['Totalt'][num_obs-2]
-gron_t1 =  df_counts_trans['1'][num_obs-2]
-gul_t1 =  df_counts_trans['2 - 10'][num_obs-2]
-orange_t1 = df_counts_trans['11 - 20'][num_obs-2]
-rod_t1 = df_counts_trans['21 - 50'][num_obs-2]
+total_t1 = turfdata.df_count_takes_trans['Totalt'][num_obs-2]
+gron_t1 =  turfdata.df_count_takes_trans['1'][num_obs-2]
+gul_t1 =  turfdata.df_count_takes_trans['2 - 10'][num_obs-2]
+orange_t1 = turfdata.df_count_takes_trans['11 - 20'][num_obs-2]
+rod_t1 = turfdata.df_count_takes_trans['21 - 50'][num_obs-2]
 
-total_t2 = df_counts_trans['Totalt'][num_obs-3]
-gron_t2 =  df_counts_trans['1'][num_obs-3]
-gul_t2 =  df_counts_trans['2 - 10'][num_obs-3]
-orange_t2 = df_counts_trans['11 - 20'][num_obs-3]
-rod_t2 = df_counts_trans['21 - 50'][num_obs-3]
+total_t2 = turfdata.df_count_takes_trans['Totalt'][num_obs-3]
+gron_t2 =  turfdata.df_count_takes_trans['1'][num_obs-3]
+gul_t2 =  turfdata.df_count_takes_trans['2 - 10'][num_obs-3]
+orange_t2 = turfdata.df_count_takes_trans['11 - 20'][num_obs-3]
+rod_t2 = turfdata.df_count_takes_trans['21 - 50'][num_obs-3]
 
-total_t3 = df_counts_trans['Totalt'][num_obs-4]
-gron_t3 =  df_counts_trans['1'][num_obs-4]
-gul_t3 =  df_counts_trans['2 - 10'][num_obs-4]
-orange_t3 = df_counts_trans['11 - 20'][num_obs-4]
-rod_t3 = df_counts_trans['21 - 50'][num_obs-4]
+total_t3 = turfdata.df_count_takes_trans['Totalt'][num_obs-4]
+gron_t3 =  turfdata.df_count_takes_trans['1'][num_obs-4]
+gul_t3 =  turfdata.df_count_takes_trans['2 - 10'][num_obs-4]
+orange_t3 = turfdata.df_count_takes_trans['11 - 20'][num_obs-4]
+rod_t3 = turfdata.df_count_takes_trans['21 - 50'][num_obs-4]
 
 nya_unika_t0 = total_t0 - total_t1
 nya_unika_t1 = total_t1 - total_t2
@@ -254,14 +268,13 @@ nya_assist_t1 = unika_assist_t1 - unika_assist_t2
 
 print(f" {num_regions_total} - {num_regions_total_prev} - {num_regions_total_2prev}")
 
-introtext = f"{turfname} har gjort totalt {takes_total} takes i {num_zones_total} unika zoner i {num_regions_total} olika regioner. "
 print("Test top 10")
 print("===========")
 print(top10_takes_last_six_months)
 print("---")
 print(top10_takes_last_six_months.iloc[0])
 print(int((top10_takes_last_six_months.iloc[0]).iloc[0]))
-
+introtext=create_introtext(turfname, takes_total, num_zones_total, num_regions_total)
 introtext = introtext + f"Under de senaste 6 månadernas turfande för {turfname} var {top10_takes_last_six_months.index.values[0]} den vanligaste zonen med {int((top10_takes_last_six_months.iloc[0]).iloc[0])} besök. "
 if(top10_takes_last_six_months.index.values[0] == top10_takes_total.index.values[0]):
     introtext = introtext + f" Även den totalt vanligaste zonen under turfkariären är {top10_takes_total.index.values[0]} med totalt {top10_takes_total[0]} besök."
@@ -293,9 +306,8 @@ else:
     introtext = introtext + f" Däremot har han besökt minst 80 procent av zonerna i {num_sv_areas_80_100} {text_kommun}. " 
     introtext = introtext + f" Därutöver har han besökt minst 50 procent av zonerna (men mindre än 80 procent) i {num_sv_areas_50_80} kommuner. " 
 
-
-
 introtext = introtext.replace('\n','<br />\n')
+
 intro_paragraph = Paragraph(introtext, style_normal)
 
 wardedfarger_heading = Paragraph("Wardedfärger", style_small_title)
@@ -307,15 +319,15 @@ wardedtext = wardedtext + "\n\n"
 wardedtext = wardedtext.replace('\n','<br />\n')
 warded_paragraph = Paragraph(wardedtext, style_normal)
 
-df_wardedfarger = df_counts.iloc[:,-6:]
+#df_wardedfarger = turfdata.df_count_takes.iloc[:,-6:]
 #table_wardedfarger_data = [list(df_wardedfarger.columns)] + [list(row) for row in df_wardedfarger.values]
 #table_wardedfarger_data.insert(0, [''] + list(df_wardedfarger.rows))
-table_wardedfarger_data = [[index] + list(row) for index, row in df_wardedfarger.iterrows()]
+table_wardedfarger_data = [[index] + list(row) for index, row in turfdata.df_wardedfarger.iterrows()]
 # Include the column names as the first row in the table data.
-table_wardedfarger_data.insert(0, [''] + list(df_wardedfarger.columns))
+table_wardedfarger_data.insert(0, [''] + list(turfdata.df_wardedfarger.columns))
 
 print("df_wardedfarger")
-print(df_wardedfarger)
+print(turfdata.df_wardedfarger)
 print("")
 print(table_wardedfarger_data)
 print("")
@@ -361,11 +373,11 @@ style_top10 = TableStyle([
 # Apply style to the table
 table_wardedfarger.setStyle(style)
 
-plot_series(df_counts_trans['2 - 10'],df_counts_trans['11 - 20'],df_counts_trans['21 - 50'], filename = '2till50.png', title='gula till röda', xlabel='halvår', ylabel='Besök')
+plot_series(turfdata.df_count_takes_trans['2 - 10'],turfdata.df_count_takes_trans['11 - 20'],turfdata.df_count_takes_trans['21 - 50'], filename = '2till50.png', title='gula till röda', xlabel='halvår', ylabel='Besök')
 diagram_2till50 = Image("2till50.png", width = 14*cm, height = 7 * cm)
-plot_series(df_counts_trans['51 - 100'],df_counts_trans['101 - 250'], filename = '51till250.png', title='Ljuslila', xlabel='halvår', ylabel='Besök')
+plot_series(turfdata.df_count_takes_trans['51 - 100'],turfdata.df_count_takes_trans['101 - 250'], filename = '51till250.png', title='Ljuslila', xlabel='halvår', ylabel='Besök')
 diagram_51till250 = Image("51till250.png", width = 14*cm, height = 7 * cm)
-plot_series(df_counts_trans['251 - 500'],df_counts_trans['501 - 1000'],df_counts_trans['1001 och mer'], filename = '251ochmer.png', title='Mörklila', xlabel='halvår', ylabel='Besök')
+plot_series(turfdata.df_count_takes_trans['251 - 500'],turfdata.df_count_takes_trans['501 - 1000'],turfdata.df_count_takes_trans['1001 och mer'], filename = '251ochmer.png', title='Mörklila', xlabel='halvår', ylabel='Besök')
 diagram_251ochmer = Image("251ochmer.png", width = 14*cm, height = 8 * cm)
 
 halfyear_heading = Paragraph("Senaste 6 månadernas turfande", style_small_title)
@@ -402,7 +414,7 @@ table_halfyear_data = [("Zon", table_period_now, table_period_prev)] + [[index] 
 table_halfyear = Table(table_halfyear_data)
 table_halfyear.setStyle(style_top10)
 
-plot_series(df_counts_trans['Nya'], filename = 'nyazoner.png', title='Nya unika zoner', xlabel='halvår', ylabel='Antal')
+plot_series(turfdata.df_count_takes_trans['Nya'], filename = 'nyazoner.png', title='Nya unika zoner', xlabel='halvår', ylabel='Antal')
 diagram_nyazoner = Image("nyazoner.png", width = 14*cm, height = 7 * cm)
 
 
