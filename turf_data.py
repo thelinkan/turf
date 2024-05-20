@@ -1,17 +1,15 @@
 import pandas as pd
 
+from format_data import import_data, takes_data
+
 class TurfData:
     def __init__(self, turfname) -> None:
         self.turfname=turfname
         pass
 
-    def set_main_dfs(self,df,df_turfdata, df_zones, df_sverige_areas, file_list):
+    def import_main_dfs(self,file_list):
         num_obs = len(file_list)
-
-        self.df_takes = df
-        self.df_turfdata = df_turfdata
-        self.df_zones = df_zones
-        self.df_sverige_areas = df_sverige_areas
+        self.df_takes, self.df_turfdata, self.df_zones, self.df_sverige_areas = import_data(file_list)
 
         self.df_turfdata_trans = self.df_turfdata.transpose()
 
@@ -37,9 +35,10 @@ class TurfData:
 
 
         
-    def set_df_count_takes(self, df_counts):
-        self.df_count_takes = df_counts
-        self.df_count_takes_trans = df_counts.transpose()
+    def set_df_count_takes(self ):
+        
+        self.df_count_takes = takes_data(self.df_takes.drop(['Country','Region','Area','Type','Takeovers'], axis=1))
+        self.df_count_takes_trans = self.df_count_takes.transpose()
         self.df_count_takes_trans['Nya'] = self.df_count_takes_trans['Totalt'].diff(1)
 
         self.df_wardedfarger = self.df_count_takes.iloc[:,-6:]

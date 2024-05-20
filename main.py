@@ -10,7 +10,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.enums import TA_CENTER
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle, Image
 
-from format_data import import_data, takes_data, plot_series, plot_stacked_series
+from format_data import takes_data, plot_series, plot_stacked_series
 from console_output import print_df
 from report_text import create_introtext
 from turf_data import TurfData
@@ -36,53 +36,35 @@ else:
     period_text = f"sommarhalvåret {artal}"
 
 # Importera data 
-df,df_turfdata, df_zones, df_sverige_areas = import_data(file_list)
+#df,df_turfdata, df_zones, df_sverige_areas = import_data(file_list)
 
-turfdata.set_main_dfs(df,df_turfdata, df_zones, df_sverige_areas, file_list)
+#turfdata.set_main_dfs(df,df_turfdata, df_zones, df_sverige_areas, file_list)
+
+turfdata.import_main_dfs(file_list)
 
 pd.options.display.float_format = '{:,.0f}'.format
 
 print_df(turfdata.df_takes,"Main df")
-df_counts = takes_data(df.drop(['Country','Region','Area','Type','Takeovers'], axis=1))
-turfdata.set_df_count_takes(df_counts)
+
+turfdata.set_df_count_takes()
 print_df(turfdata.df_count_takes,"df_counts")
 
-#df_counts_trans = df_counts.transpose()
-#df_counts_trans['Nya'] = df_counts_trans['Totalt'].diff(1)
-#print_df(df_counts_trans,"df_counts_trans")
 print_df(turfdata.df_count_takes_trans,"df_counts_trans - class")
-
-
-print_df(df_turfdata,"df_turfdata")
-df_turfdata_trans = df_turfdata.transpose()
 
 turfdata.df_takes.to_excel("c:/temp/df.xlsx")
 
-
-df_halfyear = df.drop(['Country','Region','Area','Type','Takeovers'], axis=1)
-df_halfyear = df_halfyear.reset_index()
-df_halfyear = df_halfyear.rename(columns={'index': 'Zone'})
-df_halfyear = df_halfyear.set_index('Zone')
-
-df_halfyear = df_zones.join(df_halfyear)
-print_df(df_halfyear,"df_halfyear")
-
 print_df(turfdata.df_takes_halfyear,"df_halfyear - class")
 
-for i in range(1,num_obs):
-    halfyear_col_name = file_list[i]+'halfyear'
-    df_halfyear[halfyear_col_name] = df_halfyear[file_list[i]]-df_halfyear[file_list[i-1]]
+df_filtered = turfdata.df_takes_halfyear[(turfdata.df_takes_halfyear[file_list[num_obs-2]] == 0) & (turfdata.df_takes_halfyear.iloc[:, -1] > 0)][[turfdata.df_takes_halfyear.columns[-2], turfdata.df_takes_halfyear.columns[-1]]]
+#num_zones_total = (df[df.columns[-6]] > 0).sum()
+#takes_total =  int(df[df.columns[-6]].sum())
 
-df_filtered = df_halfyear[(df_halfyear[file_list[num_obs-2]] == 0) & (df_halfyear.iloc[:, -1] > 0)][[df_halfyear.columns[-2], df_halfyear.columns[-1]]]
-num_zones_total = (df[df.columns[-6]] > 0).sum()
-takes_total =  int(df[df.columns[-6]].sum())
-
-num_zones_halfyear = (df_halfyear[df_halfyear.columns[-1]] > 0).sum()
-takes_halfyear =  int(df_halfyear[df_halfyear.columns[-1]].sum())
-num_zones_newzones = (df_filtered[df_halfyear.columns[-1]] > 0).sum()
-takes_newzones = int(df_filtered[df_halfyear.columns[-1]].sum())
+num_zones_halfyear = (turfdata.df_takes_halfyear[turfdata.df_takes_halfyear.columns[-1]] > 0).sum()
+takes_halfyear =  int(turfdata.df_takes_halfyear[turfdata.df_takes_halfyear.columns[-1]].sum())
+num_zones_newzones = (df_filtered[turfdata.df_takes_halfyear.columns[-1]] > 0).sum()
+takes_newzones = int(df_filtered[turfdata.df_takes_halfyear.columns[-1]].sum())
 #takes_newzones_prev2 = int(df_filtered[df_halfyear.columns[-3]].sum())
-df_filtered_2 = df_halfyear[(df[file_list[num_obs-7]] > 0) & (df.iloc[:, -6] == 0)][[df.columns[-7], df.columns[-6]]]
+df_filtered_2 = turfdata.df_takes_halfyear[(turfdata.df_takes[file_list[num_obs-7]] > 0) & (turfdata.df_takes.iloc[:, -6] == 0)][[turfdata.df_takes.columns[-7], turfdata.df_takes.columns[-6]]]
 num_zones_changed = (df_filtered_2[df_filtered_2.columns[-2]] > 0).sum()
 takes_changed = int(df_filtered_2[df_filtered_2.columns[-1]].sum())
 num_zones_newzones = num_zones_newzones - num_zones_changed
@@ -94,12 +76,12 @@ print_df(df_filtered_2,"df_filtered_2")
 # Länder och regioner
 turfdata.create_df_countries_regions(file_list)
 
-dfa = df.loc[df[file_list[0]]>0]
+dfa = turfdata.df_takes.loc[turfdata.df_takes[file_list[0]]>0]
 df_countries = pd.DataFrame.from_dict(dfa['Country'].value_counts())
 df_countries.rename(columns = {'count':file_list[0]}, inplace=True)
 
 for i in range(2,num_obs):
-    dfa = df.loc[df[file_list[i-1]]>0]
+    dfa = turfdata.df_takes.loc[turfdata.df_takes[file_list[i-1]]>0]
     df_countries_b = pd.DataFrame.from_dict(dfa['Country'].value_counts())
     df_countries_b.rename(columns = {'count':file_list[i-1]}, inplace=True)
     df_countries = df_countries.join(df_countries_b)
@@ -107,11 +89,11 @@ for i in range(2,num_obs):
 print_df(turfdata.df_countries,"df_countries")
 
 #dfa = df.loc[df[file_list[0]]>0]
-df_regions = pd.DataFrame.from_dict(df['Region'].value_counts())
+df_regions = pd.DataFrame.from_dict(turfdata.df_takes['Region'].value_counts())
 df_regions.rename(columns = {'count':'Total'}, inplace=True)
 
 for i in range(1,num_obs+1):
-    dfa = df.loc[df[file_list[i-1]]>0]
+    dfa = turfdata.df_takes.loc[turfdata.df_takes[file_list[i-1]]>0]
     df_regions_b = pd.DataFrame.from_dict(dfa['Region'].value_counts())
     df_regions_b.rename(columns = {'count':f'zones{file_list[i-1][5:]}'}, inplace=True)
     df_regions = df_regions.join(df_regions_b)
@@ -119,11 +101,11 @@ for i in range(1,num_obs+1):
 
 df_regions = df_regions.fillna(0)
 
-df_areas = pd.DataFrame.from_dict(df['Area'].value_counts())
+df_areas = pd.DataFrame.from_dict(turfdata.df_takes['Area'].value_counts())
 df_areas.rename(columns = {'count':'Total'}, inplace=True)
 
 for i in range(1,num_obs+1):
-    dfa = df.loc[df[file_list[i-1]]>0]
+    dfa = turfdata.df_takes.loc[turfdata.df_takes[file_list[i-1]]>0]
     df_areas_b = pd.DataFrame.from_dict(dfa['Area'].value_counts())
     df_areas_b.rename(columns = {'count':f'zones{file_list[i-1][5:]}'}, inplace=True)
     df_areas = df_areas.join(df_areas_b)
@@ -132,10 +114,10 @@ for i in range(1,num_obs+1):
 df_areas = df_areas.fillna(0)
 
 total_col_name = f'takes{file_list[num_obs-1][5:]}'
-df_sverige = df[(df[total_col_name] > 0)]
+df_sverige = turfdata.df_takes[(turfdata.df_takes[total_col_name] > 0)]
 df_sverige_areas_own = pd.DataFrame.from_dict(df_sverige['Area'].value_counts())
 df_sverige_areas_own.rename(columns = {'count':'Besökta zoner'}, inplace=True)
-df_sverige_areas = df_sverige_areas.join(df_sverige_areas_own)
+df_sverige_areas = turfdata.df_sverige_areas.join(df_sverige_areas_own)
 df_sverige_areas['Procent'] = (100 * df_sverige_areas['Besökta zoner']/df_sverige_areas['Antal zoner']).round(2)
 df_sverige_areas =df_sverige_areas.sort_values('Procent', ascending=False)
 
@@ -185,13 +167,13 @@ num_areas_halfyear_prev = (df_halfyear_areas[df_halfyear_areas.columns[-2]] > 0)
 
 
 halfyear_col_name = file_list[num_obs-1]+'halfyear'
-top10_takes_last_six_months = df_halfyear[halfyear_col_name].nlargest(10).astype(int)
+top10_takes_last_six_months = turfdata.df_takes_halfyear[halfyear_col_name].nlargest(10).astype(int)
 #top10_takes_last_six_months = top10_takes_last_six_months.join(df_halfyear[total_col_name_prev])
-top10_takes_total = df[file_list[num_obs-1]].nlargest(10).astype(int)
+top10_takes_total = turfdata.df_takes[file_list[num_obs-1]].nlargest(10).astype(int)
 top10_takes_new = df_filtered[halfyear_col_name].nlargest(10).astype(int)
 
 halfyear_col_name_prev = file_list[num_obs-2]+'halfyear'
-top10_takes_last_six_months = pd.DataFrame(top10_takes_last_six_months).join(df_halfyear[halfyear_col_name_prev])
+top10_takes_last_six_months = pd.DataFrame(top10_takes_last_six_months).join(turfdata.df_takes_halfyear[halfyear_col_name_prev])
 top10_takes_last_six_months = top10_takes_last_six_months.rename(columns={halfyear_col_name:file_list[num_obs-1][5:], halfyear_col_name_prev:file_list[num_obs-2][5:]})
 print_df(top10_takes_last_six_months,"top10_takes_last_six_months")
 
@@ -246,19 +228,19 @@ nya_unika_t0 = total_t0 - total_t1
 nya_unika_t1 = total_t1 - total_t2
 nya_unika_t2 = total_t2 - total_t3
 
-num_obs_turfdata = df_turfdata_trans.shape[0]
+num_obs_turfdata = turfdata.df_turfdata_trans.shape[0]
 
-unika_turfare_t0 = int(df_turfdata_trans['uniqueturfers'][num_obs_turfdata-1])
-unika_assist_t0 = int(df_turfdata_trans['uniqueassists'][num_obs_turfdata-1])
-ftt_t0 = int(df_turfdata_trans['ftt'][num_obs_turfdata-1])
+unika_turfare_t0 = int(turfdata.df_turfdata_trans['uniqueturfers'][num_obs_turfdata-1])
+unika_assist_t0 = int(turfdata.df_turfdata_trans['uniqueassists'][num_obs_turfdata-1])
+ftt_t0 = int(turfdata.df_turfdata_trans['ftt'][num_obs_turfdata-1])
 
-unika_turfare_t1 = int(df_turfdata_trans['uniqueturfers'][num_obs_turfdata-2])
-unika_assist_t1 = int(df_turfdata_trans['uniqueassists'][num_obs_turfdata-2])
-ftt_t1 = int(df_turfdata_trans['ftt'][num_obs_turfdata-2])
+unika_turfare_t1 = int(turfdata.df_turfdata_trans['uniqueturfers'][num_obs_turfdata-2])
+unika_assist_t1 = int(turfdata.df_turfdata_trans['uniqueassists'][num_obs_turfdata-2])
+ftt_t1 = int(turfdata.df_turfdata_trans['ftt'][num_obs_turfdata-2])
 
-unika_turfare_t2 = df_turfdata_trans['uniqueturfers'][num_obs_turfdata-3]
-unika_assist_t2 = df_turfdata_trans['uniqueassists'][num_obs_turfdata-3]
-ftt_t3 = int(df_turfdata_trans['ftt'][num_obs_turfdata-3])
+unika_turfare_t2 = turfdata.df_turfdata_trans['uniqueturfers'][num_obs_turfdata-3]
+unika_assist_t2 = turfdata.df_turfdata_trans['uniqueassists'][num_obs_turfdata-3]
+ftt_t3 = int(turfdata.df_turfdata_trans['ftt'][num_obs_turfdata-3])
 
 nya_turfare_t0 = unika_turfare_t0 - unika_turfare_t1
 nya_assist_t0 = unika_assist_t0 - unika_assist_t1
@@ -274,7 +256,7 @@ print(top10_takes_last_six_months)
 print("---")
 print(top10_takes_last_six_months.iloc[0])
 print(int((top10_takes_last_six_months.iloc[0]).iloc[0]))
-introtext=create_introtext(turfname, takes_total, num_zones_total, num_regions_total)
+introtext=create_introtext(turfname, turfdata.takes_total, turfdata.num_zones_total, num_regions_total)
 introtext = introtext + f"Under de senaste 6 månadernas turfande för {turfname} var {top10_takes_last_six_months.index.values[0]} den vanligaste zonen med {int((top10_takes_last_six_months.iloc[0]).iloc[0])} besök. "
 if(top10_takes_last_six_months.index.values[0] == top10_takes_total.index.values[0]):
     introtext = introtext + f" Även den totalt vanligaste zonen under turfkariären är {top10_takes_total.index.values[0]} med totalt {top10_takes_total[0]} besök."
@@ -441,9 +423,9 @@ interaktionertext = interaktionertext + f" Antalet unika turfare som har assista
 
 interkationer_paragraph = Paragraph(interaktionertext,style_normal)
 
-plot_series(df_turfdata_trans['uniqueturfers'], filename = 'unikaturfare.png', title='Unika turfare', xlabel='halvår', ylabel='Antal')
+plot_series(turfdata.df_turfdata_trans['uniqueturfers'], filename = 'unikaturfare.png', title='Unika turfare', xlabel='halvår', ylabel='Antal')
 unikaturfare = Image("unikaturfare.png", width = 14*cm, height = 8 * cm)
-plot_series(df_turfdata_trans['uniqueassists'], filename = 'unikaassist.png', title='Unika assisterade turfare', xlabel='halvår', ylabel='Antal')
+plot_series(turfdata.df_turfdata_trans['uniqueassists'], filename = 'unikaassist.png', title='Unika assisterade turfare', xlabel='halvår', ylabel='Antal')
 unikaassist = Image("unikaassist.png", width = 14*cm, height = 8 * cm)
 
 # Build the report content
