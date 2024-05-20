@@ -57,45 +57,15 @@ df_filtered = turfdata.df_takes_halfyear[(turfdata.df_takes_halfyear[file_list[n
 turfdata.create_df_countries_regions(file_list)
 
 print_df(turfdata.df_countries,"df_countries")
+print_df(turfdata.df_sverige_areas,"df_sverige_areas")
 
-df_areas = pd.DataFrame.from_dict(turfdata.df_takes['Area'].value_counts())
-df_areas.rename(columns = {'count':'Total'}, inplace=True)
-
-for i in range(1,num_obs+1):
-    dfa = turfdata.df_takes.loc[turfdata.df_takes[file_list[i-1]]>0]
-    df_areas_b = pd.DataFrame.from_dict(dfa['Area'].value_counts())
-    df_areas_b.rename(columns = {'count':f'zones{file_list[i-1][5:]}'}, inplace=True)
-    df_areas = df_areas.join(df_areas_b)
-    #print(f"{i}: {file_list[i-1]}")
-
-df_areas = df_areas.fillna(0)
-
-total_col_name = f'takes{file_list[num_obs-1][5:]}'
-df_sverige = turfdata.df_takes[(turfdata.df_takes[total_col_name] > 0)]
-df_sverige_areas_own = pd.DataFrame.from_dict(df_sverige['Area'].value_counts())
-df_sverige_areas_own.rename(columns = {'count':'Besökta zoner'}, inplace=True)
-df_sverige_areas = turfdata.df_sverige_areas.join(df_sverige_areas_own)
-df_sverige_areas['Procent'] = (100 * df_sverige_areas['Besökta zoner']/df_sverige_areas['Antal zoner']).round(2)
-df_sverige_areas =df_sverige_areas.sort_values('Procent', ascending=False)
-
-num_sv_areas_100 = df_sverige_areas.loc[df_sverige_areas['Besökta zoner'] == df_sverige_areas['Antal zoner']].count()['Procent']
-num_sv_areas_80_100 =df_sverige_areas.loc[df_sverige_areas['Procent']>=80].count()['Procent']
-num_sv_areas_50_80 =df_sverige_areas.loc[df_sverige_areas['Procent']>=50].count()['Procent']
-num_sv_areas_25_50 =df_sverige_areas.loc[df_sverige_areas['Procent']>=25].count()['Procent']
-
-num_sv_areas_25_50 = num_sv_areas_25_50 - num_sv_areas_50_80
-num_sv_areas_50_80 = num_sv_areas_50_80 - num_sv_areas_80_100
-num_sv_areas_80_100 = num_sv_areas_80_100 - num_sv_areas_100
-
-print_df(df_sverige_areas,"df_sverige_areas")
-
-print(f"100% - {num_sv_areas_100}")
-print(f"80% - 100% - {num_sv_areas_80_100}")
-print(f"50% - 80% - {num_sv_areas_50_80}")
-print(f"25% - 50% - {num_sv_areas_25_50}")
+print(f"100% - {turfdata.num_sv_areas_100}")
+print(f"80% - 100% - {turfdata.num_sv_areas_80_100}")
+print(f"50% - 80% - {turfdata.num_sv_areas_50_80}")
+print(f"25% - 50% - {turfdata.num_sv_areas_25_50}")
 
 df_halfyear_regions = turfdata.df_regions
-df_halfyear_areas = df_areas
+df_halfyear_areas = turfdata.df_areas
 for i in range(1,num_obs):
     total_col_name = f'zones{file_list[i][5:]}'
     total_col_name_prev = f'zones{file_list[i-1][5:]}'
@@ -118,7 +88,7 @@ num_regions_2new = num_regions_total_prev - num_regions_total_2prev
 num_regions_halfyear = (df_halfyear_regions[df_halfyear_regions.columns[-1]] > 0).sum()
 num_regions_halfyear_prev = (df_halfyear_regions[df_halfyear_regions.columns[-2]] > 0).sum()
 
-num_areas_total = (df_areas[total_col_name] > 0).sum()
+num_areas_total = (turfdata.df_areas[total_col_name] > 0).sum()
 num_areas_halfyear = (df_halfyear_areas[df_halfyear_areas.columns[-1]] > 0).sum()
 num_areas_halfyear_prev = (df_halfyear_areas[df_halfyear_areas.columns[-2]] > 0).sum()
 
@@ -222,28 +192,28 @@ else:
 introtext = introtext + f" Totalt togs {nya_unika_t0} nya unika zoner under {period_text}, jämfört med {nya_unika_t1} under halvåret innan. "
 introtext = introtext + f" Den nya zon som togs flest gånger under halvåret var {top10_takes_new.index.values[0]} med {top10_takes_new.iloc[0]} besök.\n\n"
 introtext = introtext + f" Totalt har zoner tagits från {unika_turfare_t0} olika turfare, en ökning med {nya_turfare_t0} under senaste halvåret.\n\n"
-if(num_sv_areas_100>0):
-    if (num_sv_areas_100 == 1):
+if(turfdata.num_sv_areas_100>0):
+    if (turfdata.num_sv_areas_100 == 1):
         text_kommun = "kommun"
         text_svensk = "svensk"
     else:
         text_kommun = "kommuner"
         text_svensk = "svenska"
-    if (num_sv_areas_80_100 == 1):
+    if (turfdata.num_sv_areas_80_100 == 1):
         text_kommun_80 = "kommun"
     else:
         text_kommun_80 = "kommuner"
-    introtext = introtext + f" {turfname} har besökt alla zoner i {num_sv_areas_100} {text_svensk} {text_kommun}."
-    introtext = introtext + f" Därutöver har han besökt minst 80 procent av zonerna i {num_sv_areas_80_100} {text_kommun_80} och " 
-    introtext = introtext + f" minst 50 procent av zonerna (men mindre än 80 procent) i {num_sv_areas_50_80} kommuner. " 
+    introtext = introtext + f" {turfname} har besökt alla zoner i {turfdata.num_sv_areas_100} {text_svensk} {text_kommun}."
+    introtext = introtext + f" Därutöver har han besökt minst 80 procent av zonerna i {turfdata.num_sv_areas_80_100} {text_kommun_80} och " 
+    introtext = introtext + f" minst 50 procent av zonerna (men mindre än 80 procent) i {turfdata.num_sv_areas_50_80} kommuner. " 
 else:
-    if (num_sv_areas_80_100 == 1):
+    if (turfdata.num_sv_areas_80_100 == 1):
         text_kommun = "kommun"
     else:
         text_kommun = "kommuner"
     introtext = introtext + f" {turfname} har för näravarande inte besökt alla zoner i svensk någon kommun. " 
-    introtext = introtext + f" Däremot har han besökt minst 80 procent av zonerna i {num_sv_areas_80_100} {text_kommun}. " 
-    introtext = introtext + f" Därutöver har han besökt minst 50 procent av zonerna (men mindre än 80 procent) i {num_sv_areas_50_80} kommuner. " 
+    introtext = introtext + f" Däremot har han besökt minst 80 procent av zonerna i {turfdata.num_sv_areas_80_100} {text_kommun}. " 
+    introtext = introtext + f" Därutöver har han besökt minst 50 procent av zonerna (men mindre än 80 procent) i {turfdata.num_sv_areas_50_80} kommuner. " 
 
 introtext = introtext.replace('\n','<br />\n')
 

@@ -70,3 +70,31 @@ class TurfData:
             self.df_regions = self.df_regions.join(df_regions_b)
         
         self.df_regions = self.df_regions.fillna(0)
+
+        self.df_areas = pd.DataFrame.from_dict(self.df_takes['Area'].value_counts())
+        self.df_areas.rename(columns = {'count':'Total'}, inplace=True)
+
+        for i in range(1,num_obs+1):
+            dfa = self.df_takes.loc[self.df_takes[file_list[i-1]]>0]
+            df_areas_b = pd.DataFrame.from_dict(dfa['Area'].value_counts())
+            df_areas_b.rename(columns = {'count':f'zones{file_list[i-1][5:]}'}, inplace=True)
+            self.df_areas = self.df_areas.join(df_areas_b)
+
+        self.df_areas = self.df_areas.fillna(0)
+
+        total_col_name = f'takes{file_list[num_obs-1][5:]}'
+        self.df_sverige = self.df_takes[(self.df_takes[total_col_name] > 0)]
+        self.df_sverige_areas_own = pd.DataFrame.from_dict(self.df_sverige['Area'].value_counts())
+        self.df_sverige_areas_own.rename(columns = {'count':'Besökta zoner'}, inplace=True)
+        self.df_sverige_areas = self.df_sverige_areas.join(self.df_sverige_areas_own)
+        self.df_sverige_areas['Procent'] = (100 * self.df_sverige_areas['Besökta zoner']/self.df_sverige_areas['Antal zoner']).round(2)
+        self.df_sverige_areas =self.df_sverige_areas.sort_values('Procent', ascending=False)
+
+        self.num_sv_areas_100 = self.df_sverige_areas.loc[self.df_sverige_areas['Besökta zoner'] == self.df_sverige_areas['Antal zoner']].count()['Procent']
+        self.num_sv_areas_80_100 = self.df_sverige_areas.loc[self.df_sverige_areas['Procent']>=80].count()['Procent']
+        self.num_sv_areas_50_80 = self.df_sverige_areas.loc[self.df_sverige_areas['Procent']>=50].count()['Procent']
+        self.num_sv_areas_25_50 = self.df_sverige_areas.loc[self.df_sverige_areas['Procent']>=25].count()['Procent']
+
+        self.num_sv_areas_25_50 = self.num_sv_areas_25_50 - self.num_sv_areas_50_80
+        self.num_sv_areas_50_80 = self.num_sv_areas_50_80 - self.num_sv_areas_80_100
+        self.num_sv_areas_80_100 = self.num_sv_areas_80_100 - self.num_sv_areas_100
