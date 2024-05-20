@@ -33,6 +33,11 @@ class TurfData:
         self.num_zones_newzones = (self.df_takes_filtered[self.df_takes_halfyear.columns[-1]] > 0).sum()
         self.takes_newzones = int(self.df_takes_filtered[self.df_takes_halfyear.columns[-1]].sum())
 
+        self.df_filtered_2 = self.df_takes_halfyear[(self.df_takes[file_list[num_obs-7]] > 0) & (self.df_takes.iloc[:, -6] == 0)][[self.df_takes.columns[-7], self.df_takes.columns[-6]]]
+
+        self.num_zones_changed = (self.df_filtered_2[self.df_filtered_2.columns[-2]] > 0).sum()
+        self.takes_changed = int(self.df_filtered_2[self.df_filtered_2.columns[-1]].sum())
+        self.takes_newzones = self.takes_newzones - self.takes_changed
 
         
     def set_df_count_takes(self ):
@@ -55,3 +60,13 @@ class TurfData:
             df_countries_b.rename(columns = {'count':file_list[i-1]}, inplace=True)
             self.df_countries = self.df_countries.join(df_countries_b)
 
+        self.df_regions = pd.DataFrame.from_dict(self.df_takes['Region'].value_counts())
+        self.df_regions.rename(columns = {'count':'Total'}, inplace=True)
+
+        for i in range(1,num_obs+1):
+            dfa = self.df_takes.loc[self.df_takes[file_list[i-1]]>0]
+            df_regions_b = pd.DataFrame.from_dict(dfa['Region'].value_counts())
+            df_regions_b.rename(columns = {'count':f'zones{file_list[i-1][5:]}'}, inplace=True)
+            self.df_regions = self.df_regions.join(df_regions_b)
+        
+        self.df_regions = self.df_regions.fillna(0)

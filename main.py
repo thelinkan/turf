@@ -36,10 +36,6 @@ else:
     period_text = f"sommarhalvåret {artal}"
 
 # Importera data 
-#df,df_turfdata, df_zones, df_sverige_areas = import_data(file_list)
-
-#turfdata.set_main_dfs(df,df_turfdata, df_zones, df_sverige_areas, file_list)
-
 turfdata.import_main_dfs(file_list)
 
 pd.options.display.float_format = '{:,.0f}'.format
@@ -56,50 +52,11 @@ turfdata.df_takes.to_excel("c:/temp/df.xlsx")
 print_df(turfdata.df_takes_halfyear,"df_halfyear - class")
 
 df_filtered = turfdata.df_takes_halfyear[(turfdata.df_takes_halfyear[file_list[num_obs-2]] == 0) & (turfdata.df_takes_halfyear.iloc[:, -1] > 0)][[turfdata.df_takes_halfyear.columns[-2], turfdata.df_takes_halfyear.columns[-1]]]
-#num_zones_total = (df[df.columns[-6]] > 0).sum()
-#takes_total =  int(df[df.columns[-6]].sum())
-
-num_zones_halfyear = (turfdata.df_takes_halfyear[turfdata.df_takes_halfyear.columns[-1]] > 0).sum()
-takes_halfyear =  int(turfdata.df_takes_halfyear[turfdata.df_takes_halfyear.columns[-1]].sum())
-num_zones_newzones = (df_filtered[turfdata.df_takes_halfyear.columns[-1]] > 0).sum()
-takes_newzones = int(df_filtered[turfdata.df_takes_halfyear.columns[-1]].sum())
-#takes_newzones_prev2 = int(df_filtered[df_halfyear.columns[-3]].sum())
-df_filtered_2 = turfdata.df_takes_halfyear[(turfdata.df_takes[file_list[num_obs-7]] > 0) & (turfdata.df_takes.iloc[:, -6] == 0)][[turfdata.df_takes.columns[-7], turfdata.df_takes.columns[-6]]]
-num_zones_changed = (df_filtered_2[df_filtered_2.columns[-2]] > 0).sum()
-takes_changed = int(df_filtered_2[df_filtered_2.columns[-1]].sum())
-num_zones_newzones = num_zones_newzones - num_zones_changed
-takes_newzones = takes_newzones - takes_changed
-
-print_df(df_filtered_2,"df_filtered_2")
-
 
 # Länder och regioner
 turfdata.create_df_countries_regions(file_list)
 
-dfa = turfdata.df_takes.loc[turfdata.df_takes[file_list[0]]>0]
-df_countries = pd.DataFrame.from_dict(dfa['Country'].value_counts())
-df_countries.rename(columns = {'count':file_list[0]}, inplace=True)
-
-for i in range(2,num_obs):
-    dfa = turfdata.df_takes.loc[turfdata.df_takes[file_list[i-1]]>0]
-    df_countries_b = pd.DataFrame.from_dict(dfa['Country'].value_counts())
-    df_countries_b.rename(columns = {'count':file_list[i-1]}, inplace=True)
-    df_countries = df_countries.join(df_countries_b)
-
 print_df(turfdata.df_countries,"df_countries")
-
-#dfa = df.loc[df[file_list[0]]>0]
-df_regions = pd.DataFrame.from_dict(turfdata.df_takes['Region'].value_counts())
-df_regions.rename(columns = {'count':'Total'}, inplace=True)
-
-for i in range(1,num_obs+1):
-    dfa = turfdata.df_takes.loc[turfdata.df_takes[file_list[i-1]]>0]
-    df_regions_b = pd.DataFrame.from_dict(dfa['Region'].value_counts())
-    df_regions_b.rename(columns = {'count':f'zones{file_list[i-1][5:]}'}, inplace=True)
-    df_regions = df_regions.join(df_regions_b)
-    #print(f"{i}: {file_list[i-1]}")
-
-df_regions = df_regions.fillna(0)
 
 df_areas = pd.DataFrame.from_dict(turfdata.df_takes['Area'].value_counts())
 df_areas.rename(columns = {'count':'Total'}, inplace=True)
@@ -137,7 +94,7 @@ print(f"80% - 100% - {num_sv_areas_80_100}")
 print(f"50% - 80% - {num_sv_areas_50_80}")
 print(f"25% - 50% - {num_sv_areas_25_50}")
 
-df_halfyear_regions = df_regions
+df_halfyear_regions = turfdata.df_regions
 df_halfyear_areas = df_areas
 for i in range(1,num_obs):
     total_col_name = f'zones{file_list[i][5:]}'
@@ -147,15 +104,15 @@ for i in range(1,num_obs):
     df_halfyear_regions[halfyear_col_name] = df_halfyear_regions[total_col_name]-df_halfyear_regions[total_col_name_prev]
     df_halfyear_areas[halfyear_col_name] = df_halfyear_areas[total_col_name]-df_halfyear_areas[total_col_name_prev]
 
-print_df(df_regions,"df_regions")
+print_df(turfdata.df_regions,"df_regions")
 
 print_df(df_halfyear_regions,"df_halfyear_regions")
 
 df_halfyear_regions.to_excel("c:/temp/df_halfyear_regions.xlsx")
-df_regions.to_excel("c:/temp/df_regions.xlsx")
-num_regions_total = (df_regions[total_col_name] > 0).sum()
-num_regions_total_prev = (df_regions[total_col_name_prev] > 0).sum()
-num_regions_total_2prev = (df_regions[total_col_name_2prev] > 0).sum()
+turfdata.df_regions.to_excel("c:/temp/df_regions.xlsx")
+num_regions_total = (turfdata.df_regions[total_col_name] > 0).sum()
+num_regions_total_prev = (turfdata.df_regions[total_col_name_prev] > 0).sum()
+num_regions_total_2prev = (turfdata.df_regions[total_col_name_2prev] > 0).sum()
 num_regions_new = num_regions_total - num_regions_total_prev
 num_regions_2new = num_regions_total_prev - num_regions_total_2prev
 num_regions_halfyear = (df_halfyear_regions[df_halfyear_regions.columns[-1]] > 0).sum()
@@ -177,7 +134,7 @@ top10_takes_last_six_months = pd.DataFrame(top10_takes_last_six_months).join(tur
 top10_takes_last_six_months = top10_takes_last_six_months.rename(columns={halfyear_col_name:file_list[num_obs-1][5:], halfyear_col_name_prev:file_list[num_obs-2][5:]})
 print_df(top10_takes_last_six_months,"top10_takes_last_six_months")
 
-print_df(num_zones_changed,"num_zones_changed")
+print_df(turfdata.num_zones_changed,"num_zones_changed")
 
 # Create a PDF document with A4 size
 doc = SimpleDocTemplate("turfrapport.pdf", pagesize=A4)
@@ -364,7 +321,7 @@ diagram_251ochmer = Image("251ochmer.png", width = 14*cm, height = 8 * cm)
 
 halfyear_heading = Paragraph("Senaste 6 månadernas turfande", style_small_title)
 
-halfyeartext = f"Under de senaste 6 månadernas turfande gjordes totalt {takes_halfyear} besök vid {num_zones_halfyear} olika zoner i {num_regions_halfyear} olika regioner och {num_areas_halfyear} olika areor (motsvarande kommuner). "
+halfyeartext = f"Under de senaste 6 månadernas turfande gjordes totalt {turfdata.takes_halfyear} besök vid {turfdata.num_zones_halfyear} olika zoner i {num_regions_halfyear} olika regioner och {num_areas_halfyear} olika areor (motsvarande kommuner). "
 if num_regions_new>0:
     if num_regions_2new>0:
         halfyeartext = halfyeartext + f" {num_regions_new} av dessa regioner var helt nya, jämfört med {num_regions_2new} föregående halvår. "
@@ -373,7 +330,7 @@ if num_regions_new>0:
 else:
     if num_regions_2new>0:
         halfyeartext = halfyeartext + f" Det var inga nya regioner det senaste halvåret, men {num_regions_2new} var nya föregående halvår. "
-halfyeartext = halfyeartext + f"Av besöken detta halvår gjordes totalt {takes_newzones} besök vid {num_zones_newzones} nya zoner. "
+halfyeartext = halfyeartext + f"Av besöken detta halvår gjordes totalt {turfdata.takes_newzones} besök vid {turfdata.num_zones_newzones} nya zoner. "
 #halfyeartext = halfyeartext + f"Motsvarande halvår för ett år sedan var det {takes_newzones_prev2} besök vid {num_zones_newzones} nya zoner. "
 
 
@@ -382,8 +339,8 @@ if nya_ftt_t0>0:
 else:
     halfyeartext = halfyeartext + f" Du lyckades inte vara den första turfaren att ta några zoner det senaste halvåret. \n\n"
 
-if(num_zones_changed>0):
-    halfyeartext = halfyeartext + f"Antalet besök i de nya zonerna kan vara något överskattad, då {num_zones_changed} zoner antingen har bytt "
+if(turfdata.num_zones_changed>0):
+    halfyeartext = halfyeartext + f"Antalet besök i de nya zonerna kan vara något överskattad, då {turfdata.num_zones_changed} zoner antingen har bytt "
     halfyeartext = halfyeartext + f"namn under det senaste halvåret eller tagits bort utan att det kunnat korrigeras för. \n\n"
 
 halfyeartext = halfyeartext + f"Tabellen nedan visar hur många gånger {turfname} besökt var och en av de tio zoner som besökts mest under de senaste sex månaderna,"
