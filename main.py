@@ -157,29 +157,29 @@ zone_list = top10_takes_last_six_months.index.values
 #    zone_name = df[df['takes202210halfyear']==top10_takes_last_six_months[0]].index[0]
 #else:
 #    zone_name = ""
-total_t0 = turfdata.df_count_takes_trans['Totalt'][num_obs-1]
-gron_t0 =  turfdata.df_count_takes_trans['1'][num_obs-1]
-gul_t0 =  turfdata.df_count_takes_trans['2 - 10'][num_obs-1]
-orange_t0 = turfdata.df_count_takes_trans['11 - 20'][num_obs-1]
-rod_t0 = turfdata.df_count_takes_trans['21 - 50'][num_obs-1]
+total_t0 = turfdata.df_count_takes_trans['Totalt'].iloc[num_obs-1]
+gron_t0 =  turfdata.df_count_takes_trans['1'].iloc[num_obs-1]
+gul_t0 =  turfdata.df_count_takes_trans['2 - 10'].iloc[num_obs-1]
+orange_t0 = turfdata.df_count_takes_trans['11 - 20'].iloc[num_obs-1]
+rod_t0 = turfdata.df_count_takes_trans['21 - 50'].iloc[num_obs-1]
 
-total_t1 = turfdata.df_count_takes_trans['Totalt'][num_obs-2]
-gron_t1 =  turfdata.df_count_takes_trans['1'][num_obs-2]
-gul_t1 =  turfdata.df_count_takes_trans['2 - 10'][num_obs-2]
-orange_t1 = turfdata.df_count_takes_trans['11 - 20'][num_obs-2]
-rod_t1 = turfdata.df_count_takes_trans['21 - 50'][num_obs-2]
+total_t1 = turfdata.df_count_takes_trans['Totalt'].iloc[num_obs-2]
+gron_t1 =  turfdata.df_count_takes_trans['1'].iloc[num_obs-2]
+gul_t1 =  turfdata.df_count_takes_trans['2 - 10'].iloc[num_obs-2]
+orange_t1 = turfdata.df_count_takes_trans['11 - 20'].iloc[num_obs-2]
+rod_t1 = turfdata.df_count_takes_trans['21 - 50'].iloc[num_obs-2]
 
-total_t2 = turfdata.df_count_takes_trans['Totalt'][num_obs-3]
-gron_t2 =  turfdata.df_count_takes_trans['1'][num_obs-3]
-gul_t2 =  turfdata.df_count_takes_trans['2 - 10'][num_obs-3]
-orange_t2 = turfdata.df_count_takes_trans['11 - 20'][num_obs-3]
-rod_t2 = turfdata.df_count_takes_trans['21 - 50'][num_obs-3]
+total_t2 = turfdata.df_count_takes_trans['Totalt'].iloc[num_obs-3]
+gron_t2 =  turfdata.df_count_takes_trans['1'].iloc[num_obs-3]
+gul_t2 =  turfdata.df_count_takes_trans['2 - 10'].iloc[num_obs-3]
+orange_t2 = turfdata.df_count_takes_trans['11 - 20'].iloc[num_obs-3]
+rod_t2 = turfdata.df_count_takes_trans['21 - 50'].iloc[num_obs-3]
 
-total_t3 = turfdata.df_count_takes_trans['Totalt'][num_obs-4]
-gron_t3 =  turfdata.df_count_takes_trans['1'][num_obs-4]
-gul_t3 =  turfdata.df_count_takes_trans['2 - 10'][num_obs-4]
-orange_t3 = turfdata.df_count_takes_trans['11 - 20'][num_obs-4]
-rod_t3 = turfdata.df_count_takes_trans['21 - 50'][num_obs-4]
+total_t3 = turfdata.df_count_takes_trans['Totalt'].iloc[num_obs-4]
+gron_t3 =  turfdata.df_count_takes_trans['1'].iloc[num_obs-4]
+gul_t3 =  turfdata.df_count_takes_trans['2 - 10'].iloc[num_obs-4]
+orange_t3 = turfdata.df_count_takes_trans['11 - 20'].iloc[num_obs-4]
+rod_t3 = turfdata.df_count_takes_trans['21 - 50'].iloc[num_obs-4]
 
 nya_unika_t0 = total_t0 - total_t1
 nya_unika_t1 = total_t1 - total_t2
@@ -187,17 +187,17 @@ nya_unika_t2 = total_t2 - total_t3
 
 num_obs_turfdata = turfdata.df_turfdata_trans.shape[0]
 
-unika_turfare_t0 = int(turfdata.df_turfdata_trans['uniqueturfers'][num_obs_turfdata-1])
-unika_assist_t0 = int(turfdata.df_turfdata_trans['uniqueassists'][num_obs_turfdata-1])
-ftt_t0 = int(turfdata.df_turfdata_trans['ftt'][num_obs_turfdata-1])
+unika_turfare_t0 = int(turfdata.df_turfdata_trans['uniqueturfers'].iloc[num_obs_turfdata-1])
+unika_assist_t0 = int(turfdata.df_turfdata_trans['uniqueassists'].iloc[num_obs_turfdata-1])
+ftt_t0 = int(turfdata.df_turfdata_trans['ftt'].iloc[num_obs_turfdata-1])
 
-unika_turfare_t1 = int(turfdata.df_turfdata_trans['uniqueturfers'][num_obs_turfdata-2])
-unika_assist_t1 = int(turfdata.df_turfdata_trans['uniqueassists'][num_obs_turfdata-2])
-ftt_t1 = int(turfdata.df_turfdata_trans['ftt'][num_obs_turfdata-2])
+unika_turfare_t1 = int(turfdata.df_turfdata_trans['uniqueturfers'].iloc[num_obs_turfdata-2])
+unika_assist_t1 = int(turfdata.df_turfdata_trans['uniqueassists'].iloc[num_obs_turfdata-2])
+ftt_t1 = int(turfdata.df_turfdata_trans['ftt'].iloc[num_obs_turfdata-2])
 
-unika_turfare_t2 = turfdata.df_turfdata_trans['uniqueturfers'][num_obs_turfdata-3]
-unika_assist_t2 = turfdata.df_turfdata_trans['uniqueassists'][num_obs_turfdata-3]
-ftt_t3 = int(turfdata.df_turfdata_trans['ftt'][num_obs_turfdata-3])
+unika_turfare_t2 = turfdata.df_turfdata_trans['uniqueturfers'].iloc[num_obs_turfdata-3]
+unika_assist_t2 = turfdata.df_turfdata_trans['uniqueassists'].iloc[num_obs_turfdata-3]
+ftt_t3 = int(turfdata.df_turfdata_trans['ftt'].iloc[num_obs_turfdata-3])
 
 nya_turfare_t0 = unika_turfare_t0 - unika_turfare_t1
 nya_assist_t0 = unika_assist_t0 - unika_assist_t1
@@ -216,11 +216,11 @@ print(int((top10_takes_last_six_months.iloc[0]).iloc[0]))
 introtext=create_introtext(turfname, turfdata.takes_total, turfdata.num_zones_total, num_regions_total)
 introtext = introtext + f"Under de senaste 6 månadernas turfande för {turfname} var {top10_takes_last_six_months.index.values[0]} den vanligaste zonen med {int((top10_takes_last_six_months.iloc[0]).iloc[0])} besök. "
 if(top10_takes_last_six_months.index.values[0] == top10_takes_total.index.values[0]):
-    introtext = introtext + f" Även den totalt vanligaste zonen under turfkariären är {top10_takes_total.index.values[0]} med totalt {top10_takes_total[0]} besök."
+    introtext = introtext + f" Även den totalt vanligaste zonen under turfkariären är {top10_takes_total.index.values[0]} med totalt {top10_takes_total.iloc[0]} besök."
 else:
-    introtext = introtext + f" Den totalt sett vanligaste zonen under turfkariären är {top10_takes_total.index.values[0]} med totalt {top10_takes_total[0]} besök."
+    introtext = introtext + f" Den totalt sett vanligaste zonen under turfkariären är {top10_takes_total.index.values[0]} med totalt {top10_takes_total.iloc[0]} besök."
 introtext = introtext + f" Totalt togs {nya_unika_t0} nya unika zoner under {period_text}, jämfört med {nya_unika_t1} under halvåret innan. "
-introtext = introtext + f" Den nya zon som togs flest gånger under halvåret var {top10_takes_new.index.values[0]} med {top10_takes_new[0]} besök.\n\n"
+introtext = introtext + f" Den nya zon som togs flest gånger under halvåret var {top10_takes_new.index.values[0]} med {top10_takes_new.iloc[0]} besök.\n\n"
 introtext = introtext + f" Totalt har zoner tagits från {unika_turfare_t0} olika turfare, en ökning med {nya_turfare_t0} under senaste halvåret.\n\n"
 if(num_sv_areas_100>0):
     if (num_sv_areas_100 == 1):
