@@ -105,10 +105,10 @@ class TurfData:
     def create_df_countries_regions(self,file_list):
         num_obs = len(file_list)
 
-        dfa = self.df_takes.loc[self.df_takes[file_list[0]]>0]
+        dfa = self.df_takes.loc[self.df_takes[file_list[num_obs-1]]>0]
         self.df_countries = pd.DataFrame.from_dict(dfa['Country'].value_counts())
-        self.df_countries.rename(columns = {'count':file_list[0]}, inplace=True)
-        for i in range(2,num_obs):
+        self.df_countries.rename(columns = {'count':'tot'}, inplace=True)
+        for i in range(1,num_obs):
             dfa = self.df_takes.loc[self.df_takes[file_list[i-1]]>0]
             df_countries_b = pd.DataFrame.from_dict(dfa['Country'].value_counts())
             df_countries_b.rename(columns = {'count':file_list[i-1]}, inplace=True)
@@ -188,5 +188,15 @@ class TurfData:
         halfyear_col_name_prev = file_list[num_obs-2]+'halfyear'
         self.top10_takes_last_six_months = pd.DataFrame(self.top10_takes_last_six_months).join(self.df_takes_halfyear[halfyear_col_name_prev])
         self.top10_takes_last_six_months = self.top10_takes_last_six_months.rename(columns={halfyear_col_name:file_list[num_obs-1][5:], halfyear_col_name_prev:file_list[num_obs-2][5:]})
+        self.top10_takes_last_six_months = self.top10_takes_last_six_months.astype(int)
 
-    
+        col_name = 'zones'+file_list[num_obs-1][5:]
+        halfyear_col_name = 'zones'+file_list[num_obs-1][5:]+'halfyear'
+        self.top10_zones_per_region_halfyear = self.df_halfyear_regions[halfyear_col_name].nlargest(10).astype(int)
+        self.top10_zones_per_region = self.df_regions[col_name].nlargest(10).astype(int)
+        
+        col_name_prev = 'zones'+file_list[num_obs-2][5:]
+        halfyear_col_name_prev = 'zones'+file_list[num_obs-2][5:]+'halfyear'
+        self.top10_zones_per_region_halfyear_prev = self.df_halfyear_regions[halfyear_col_name_prev].nlargest(10).astype(int)
+        self.top10_zones_per_region_prev = self.df_regions[col_name_prev].nlargest(10).astype(int)
+

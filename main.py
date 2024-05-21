@@ -30,14 +30,6 @@ manad = int(file_list[num_obs-1][9:11])
 turfdata = TurfData(turfname, artal_int, manad)
 print(turfdata.turfname)
 
-if manad == 4:
-    period_text = f"vinterhalvåret {str(artal_int-1)}/{artal[2:]}"
-    table_period_now = f"vinter {str(artal_int-2001)}/{str(artal_int-2000)}"
-    table_period_prev = f"sommar {str(artal_int-2001)}"
-
-else:
-    period_text = f"sommarhalvåret {artal}"
-
 # Importera data 
 turfdata.import_main_dfs(file_list)
 
@@ -53,8 +45,6 @@ print_df(turfdata.df_count_takes_trans,"df_counts_trans - class")
 turfdata.df_takes.to_excel("c:/temp/df.xlsx")
 
 print_df(turfdata.df_takes_halfyear,"df_halfyear - class")
-
-#df_filtered = turfdata.df_takes_halfyear[(turfdata.df_takes_halfyear[file_list[num_obs-2]] == 0) & (turfdata.df_takes_halfyear.iloc[:, -1] > 0)][[turfdata.df_takes_halfyear.columns[-2], turfdata.df_takes_halfyear.columns[-1]]]
 
 # Länder och regioner
 turfdata.create_df_countries_regions(file_list)
@@ -92,10 +82,16 @@ print(f" {turfdata.num_regions_total} - {turfdata.num_regions_total_prev} - {tur
 
 print("Test top 10")
 print("===========")
-print(turfdata.top10_takes_last_six_months)
+print(turfdata.top10_zones_per_region_halfyear)
 print("---")
-print(turfdata.top10_takes_last_six_months.iloc[0])
-print(int((turfdata.top10_takes_last_six_months.iloc[0]).iloc[0]))
+print(turfdata.top10_zones_per_region_halfyear_prev)
+print("---")
+print(turfdata.top10_zones_per_region)
+print("---")
+print(turfdata.top10_zones_per_region_prev)
+
+#print(turfdata.top10_takes_last_six_months.iloc[0])
+#print(int((turfdata.top10_takes_last_six_months.iloc[0]).iloc[0]))
 #introtext=create_introtext(turfdata)
 
 intro_paragraph = Paragraph(create_introtext(turfdata), style_normal)
@@ -129,6 +125,9 @@ halfyear_heading = Paragraph("Senaste 6 månadernas turfande", style_small_title
 halfyear_paragraph = Paragraph(create_halfyeartext(turfdata), style_normal)
 
 
+table_period_now = periodtext_kort(turfdata.artal,turfdata.manad)
+prevp_artal,prevp_manad = prev_period(turfdata.artal,turfdata.manad)
+table_period_prev = periodtext_kort(prevp_artal,prevp_manad)
 table_halfyear_data = [("Zon", table_period_now, table_period_prev)] + [[index] + list(row) for index, row in turfdata.top10_takes_last_six_months.iterrows()]
 table_halfyear = Table(table_halfyear_data)
 table_halfyear.setStyle(style_top10)
@@ -162,9 +161,3 @@ flowables = [heading, intro_paragraph, wardedfarger_heading, warded_paragraph, t
 
 # Set up the document and write the content
 doc.build(flowables)
-
-
-#plt2 = plot_series(df_counts_trans['501 - 1000'],df_counts_trans['1001+'])
-
-#plt1.show()
-#plt2.show()
