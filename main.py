@@ -12,7 +12,7 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle, 
 
 from format_data import takes_data, plot_series, plot_stacked_series
 from console_output import print_df
-from report_text import create_introtext, periodtext, periodtext_kort, prev_period
+from report_text import create_introtext, create_wardedtext, periodtext, periodtext_kort, prev_period
 from turf_data import TurfData
 from styles import style, style_top10, styles, style_normal,style_small_title,style_title
 
@@ -101,7 +101,7 @@ intro_paragraph = Paragraph(create_introtext(turfdata), style_normal)
 
 wardedfarger_heading = Paragraph("Wardedfärger", style_small_title)
 
-warded_paragraph = Paragraph(create_introtext(turfdata), style_normal)
+warded_paragraph = Paragraph(create_wardedtext(turfdata), style_normal)
 
 #df_wardedfarger = turfdata.df_count_takes.iloc[:,-6:]
 #table_wardedfarger_data = [list(df_wardedfarger.columns)] + [list(row) for row in df_wardedfarger.values]
