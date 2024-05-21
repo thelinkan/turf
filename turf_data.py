@@ -192,11 +192,13 @@ class TurfData:
 
         col_name = 'zones'+file_list[num_obs-1][5:]
         halfyear_col_name = 'zones'+file_list[num_obs-1][5:]+'halfyear'
-        self.top10_zones_per_region_halfyear = self.df_halfyear_regions[halfyear_col_name].nlargest(10).astype(int)
+        df_halfyear_regions = self.df_halfyear_regions[self.df_halfyear_regions[halfyear_col_name]>0]
+        self.top10_zones_per_region_halfyear = df_halfyear_regions[halfyear_col_name].nlargest(10).astype(int)
         self.top10_zones_per_region = self.df_regions[col_name].nlargest(10).astype(int)
         
         col_name_prev = 'zones'+file_list[num_obs-2][5:]
         halfyear_col_name_prev = 'zones'+file_list[num_obs-2][5:]+'halfyear'
-        self.top10_zones_per_region_halfyear_prev = self.df_halfyear_regions[halfyear_col_name_prev].nlargest(10).astype(int)
+        df_halfyear_regions = self.df_halfyear_regions[self.df_halfyear_regions[halfyear_col_name_prev]>0]
+        self.top10_zones_per_region_halfyear_prev = df_halfyear_regions[halfyear_col_name_prev].nlargest(10).astype(int)
         self.top10_zones_per_region_prev = self.df_regions[col_name_prev].nlargest(10).astype(int)
 

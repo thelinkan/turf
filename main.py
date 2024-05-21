@@ -13,6 +13,7 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle, 
 from format_data import takes_data, plot_series, plot_stacked_series
 from console_output import print_df
 from report_text import create_introtext, create_wardedtext, create_halfyeartext, create_newtext, create_totaltext, create_interactiontext
+from report_text import create_regionaltext
 from report_text import periodtext, periodtext_kort, prev_period
 from turf_data import TurfData
 from styles import style, style_top10, styles, style_normal,style_small_title,style_title
@@ -149,14 +150,21 @@ table_total.setStyle(style_top10)
 interkationer_heading = Paragraph("Interaktioner", style_small_title)
 interkationer_paragraph = Paragraph(create_interactiontext(turfdata),style_normal)
 
+regional_heading = Paragraph("Regionala data", style_small_title)
+regional_paragraph = Paragraph(create_regionaltext(turfdata),style_normal)
+
+
 plot_series(turfdata.df_turfdata_trans['uniqueturfers'], filename = 'unikaturfare.png', title='Unika turfare', xlabel='halvår', ylabel='Antal')
-unikaturfare = Image("unikaturfare.png", width = 14*cm, height = 8 * cm)
+diagram_unikaturfare = Image("unikaturfare.png", width = 14*cm, height = 8 * cm)
 plot_series(turfdata.df_turfdata_trans['uniqueassists'], filename = 'unikaassist.png', title='Unika assisterade turfare', xlabel='halvår', ylabel='Antal')
-unikaassist = Image("unikaassist.png", width = 14*cm, height = 8 * cm)
+diagram_unikaassist = Image("unikaassist.png", width = 14*cm, height = 8 * cm)
+
+
 
 # Build the report content
 flowables = [heading, intro_paragraph, wardedfarger_heading, warded_paragraph, table_wardedfarger,
-             diagram_2till50, diagram_51till250, diagram_251ochmer, interkationer_heading, interkationer_paragraph, unikaturfare, unikaassist, halfyear_heading, halfyear_paragraph,
+             diagram_2till50, diagram_51till250, diagram_251ochmer, interkationer_heading, interkationer_paragraph, diagram_unikaturfare, diagram_unikaassist, 
+             regional_heading, regional_paragraph, halfyear_heading, halfyear_paragraph,
              table_halfyear, diagram_nyazoner, new_paragraph, table_new, total_paragraph, table_total]
 
 # Set up the document and write the content

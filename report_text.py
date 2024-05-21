@@ -85,10 +85,18 @@ def create_totaltext(turfdata):
 
 def create_interactiontext(turfdata):
     interaktionertext = f" Totalt har zoner tagits från {turfdata.unika_turfare_t0} olika turfare, varav {turfdata.nya_turfare_t0} "
-    interaktionertext = f"var nya unika turfare {periodtext(turfdata.artal,turfdata.manad)}."
+    interaktionertext = interaktionertext + f"var nya unika turfare {periodtext(turfdata.artal,turfdata.manad)}."
     interaktionertext = interaktionertext + f" Under halvåret innan ökade antalet unika turfare med {turfdata.nya_turfare_t1}."
     interaktionertext = interaktionertext + f" Antalet unika turfare som har assistats har ökat från {turfdata.unika_assist_t1} till {turfdata.unika_assist_t0}."
     return interaktionertext
+
+def create_regionaltext(turfdata):
+    regionaltext = f"Den region där {turfdata.turfname} besökt flest nya zoner under {periodtext(turfdata.artal,turfdata.manad)} var "
+    regionaltext = regionaltext + f"{turfdata.top10_zones_per_region_halfyear.index.values[0]} där {turfdata.top10_zones_per_region_halfyear.iloc[0]} "
+    regionaltext = regionaltext + f"nya unika zoner besöktes. "
+    regionaltext = regionaltext + f"Över hela turfkariären är {turfdata.top10_zones_per_region.index.values[0]} den region där det besökts flest unika zoner, "
+    regionaltext = regionaltext + f"med {turfdata.top10_zones_per_region.iloc[0]} stycken."
+    return regionaltext
 
 def periodtext_kort(artal,manad):
     if manad == 4:
