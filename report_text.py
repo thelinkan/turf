@@ -40,7 +40,7 @@ def create_introtext(turfdata):
     introtext = introtext.replace('\n','<br />\n')
 
     return introtext
-def create_introtext(turfdata):
+def create_wardedtext(turfdata):
     wardedtext = "I detta avsnitt kommer information om hur många zoner som har respektive wardedfärg. "
     wardedtext = wardedtext + "Förutom de vanliga färgerna grön, gul, röd och lila, så har de lila zonerna delats upp i 51-100, 101-250, 251-500, 501-1000 och 1001+. "
     wardedtext = wardedtext + "Ibland kan antalet zoner i en grupp minska, det beror på att fler zoner har flyttats upp en nivå, än som har tillkommit i den aktuella nivån. "

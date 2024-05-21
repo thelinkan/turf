@@ -14,6 +14,7 @@ from format_data import takes_data, plot_series, plot_stacked_series
 from console_output import print_df
 from report_text import create_introtext, periodtext, periodtext_kort, prev_period
 from turf_data import TurfData
+from styles import style, style_top10, styles, style_normal,style_small_title,style_title
 
 turfname='TheLinkan'
 
@@ -83,14 +84,6 @@ print_df(turfdata.num_zones_changed,"num_zones_changed")
 # Create a PDF document with A4 size
 doc = SimpleDocTemplate("turfrapport.pdf", pagesize=A4)
 
-# Set up styles
-styles = getSampleStyleSheet()
-style_title = styles['Title']
-#style_bold = styles['Bold']
-style_normal = styles['Normal']
-style_small_title = styles['Heading2']
-
-
 # Create content for the report
 heading = Paragraph(f"Turfrapport {turfdata.turfname} {manad_lista[turfdata.manad-1]} {turfdata.artal}", style_title)
 
@@ -125,42 +118,6 @@ print("")
 
 table_wardedfarger = Table(table_wardedfarger_data)
 # Add style to the table
-style = TableStyle([
-    ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-    ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
-    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-    ('FONTSIZE', (0, 0), (-1, 0), 10),
-    ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
-    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-    ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
-    ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
-    ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-    ('FONTSIZE', (0, 1), (-1, -1), 9),
-    ('BOTTOMPADDING', (0, 1), (-1, -1), 3),
-    ('BACKGROUND', (0, -1), (-1, -1), colors.grey),
-    ('TEXTCOLOR', (0, -1), (-1, -1), colors.whitesmoke),
-    ('ALIGN', (0, -1), (-1, -1), 'CENTER'),
-    ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
-    ('FONTSIZE', (0, -1), (-1, -1), 10),
-    ('TOPPADDING', (0, -1), (-1, -1), 6),
-])
-
-style_top10 = TableStyle([
-    ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-    ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
-    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-    ('FONTSIZE', (0, 0), (-1, 0), 10),
-    ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
-    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-    ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
-    ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
-    ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-    ('FONTSIZE', (0, 1), (-1, -1), 9),
-    ('BOTTOMPADDING', (0, 1), (-1, -1), 3),
-])
-
 # Apply style to the table
 table_wardedfarger.setStyle(style)
 
