@@ -12,13 +12,11 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle, 
 
 from format_data import takes_data, plot_series, plot_stacked_series
 from console_output import print_df
-from report_text import create_introtext
+from report_text import create_introtext, periodtext, periodtext_kort, prev_period
 from turf_data import TurfData
 
 turfname='TheLinkan'
 
-turfdata = TurfData(turfname)
-print(turfdata.turfname)
 
 file_list = ['takes201610', 'takes201704','takes201710', 'takes201804','takes201810', 'takes201904', 'takes201910', 'takes202004','takes202010', 'takes202104', 'takes202110', 'takes202204', 'takes202210', 'takes202304', 'takes202310', 'takes202404']
 manad_lista = ["januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"]
@@ -26,6 +24,9 @@ num_obs = len(file_list)
 artal = file_list[num_obs-1][5:9]
 artal_int = int(artal)
 manad = int(file_list[num_obs-1][9:11])
+
+turfdata = TurfData(turfname, artal_int, manad)
+print(turfdata.turfname)
 
 if manad == 4:
     period_text = f"vinterhalvåret {str(artal_int-1)}/{artal[2:]}"
@@ -51,7 +52,7 @@ turfdata.df_takes.to_excel("c:/temp/df.xlsx")
 
 print_df(turfdata.df_takes_halfyear,"df_halfyear - class")
 
-df_filtered = turfdata.df_takes_halfyear[(turfdata.df_takes_halfyear[file_list[num_obs-2]] == 0) & (turfdata.df_takes_halfyear.iloc[:, -1] > 0)][[turfdata.df_takes_halfyear.columns[-2], turfdata.df_takes_halfyear.columns[-1]]]
+#df_filtered = turfdata.df_takes_halfyear[(turfdata.df_takes_halfyear[file_list[num_obs-2]] == 0) & (turfdata.df_takes_halfyear.iloc[:, -1] > 0)][[turfdata.df_takes_halfyear.columns[-2], turfdata.df_takes_halfyear.columns[-1]]]
 
 # Länder och regioner
 turfdata.create_df_countries_regions(file_list)
@@ -64,45 +65,17 @@ print(f"80% - 100% - {turfdata.num_sv_areas_80_100}")
 print(f"50% - 80% - {turfdata.num_sv_areas_50_80}")
 print(f"25% - 50% - {turfdata.num_sv_areas_25_50}")
 
-df_halfyear_regions = turfdata.df_regions
-df_halfyear_areas = turfdata.df_areas
-for i in range(1,num_obs):
-    total_col_name = f'zones{file_list[i][5:]}'
-    total_col_name_prev = f'zones{file_list[i-1][5:]}'
-    total_col_name_2prev = f'zones{file_list[i-2][5:]}'
-    halfyear_col_name = f'zones{file_list[i][5:]}halfyear'
-    df_halfyear_regions[halfyear_col_name] = df_halfyear_regions[total_col_name]-df_halfyear_regions[total_col_name_prev]
-    df_halfyear_areas[halfyear_col_name] = df_halfyear_areas[total_col_name]-df_halfyear_areas[total_col_name_prev]
-
 print_df(turfdata.df_regions,"df_regions")
 
-print_df(df_halfyear_regions,"df_halfyear_regions")
+print_df(turfdata.df_halfyear_regions,"df_halfyear_regions")
 
-df_halfyear_regions.to_excel("c:/temp/df_halfyear_regions.xlsx")
+turfdata.df_halfyear_regions.to_excel("c:/temp/df_halfyear_regions.xlsx")
 turfdata.df_regions.to_excel("c:/temp/df_regions.xlsx")
-num_regions_total = (turfdata.df_regions[total_col_name] > 0).sum()
-num_regions_total_prev = (turfdata.df_regions[total_col_name_prev] > 0).sum()
-num_regions_total_2prev = (turfdata.df_regions[total_col_name_2prev] > 0).sum()
-num_regions_new = num_regions_total - num_regions_total_prev
-num_regions_2new = num_regions_total_prev - num_regions_total_2prev
-num_regions_halfyear = (df_halfyear_regions[df_halfyear_regions.columns[-1]] > 0).sum()
-num_regions_halfyear_prev = (df_halfyear_regions[df_halfyear_regions.columns[-2]] > 0).sum()
 
-num_areas_total = (turfdata.df_areas[total_col_name] > 0).sum()
-num_areas_halfyear = (df_halfyear_areas[df_halfyear_areas.columns[-1]] > 0).sum()
-num_areas_halfyear_prev = (df_halfyear_areas[df_halfyear_areas.columns[-2]] > 0).sum()
+turfdata.create_top10s(file_list)
+turfdata.count_unique_zones(file_list)
 
-
-halfyear_col_name = file_list[num_obs-1]+'halfyear'
-top10_takes_last_six_months = turfdata.df_takes_halfyear[halfyear_col_name].nlargest(10).astype(int)
-#top10_takes_last_six_months = top10_takes_last_six_months.join(df_halfyear[total_col_name_prev])
-top10_takes_total = turfdata.df_takes[file_list[num_obs-1]].nlargest(10).astype(int)
-top10_takes_new = df_filtered[halfyear_col_name].nlargest(10).astype(int)
-
-halfyear_col_name_prev = file_list[num_obs-2]+'halfyear'
-top10_takes_last_six_months = pd.DataFrame(top10_takes_last_six_months).join(turfdata.df_takes_halfyear[halfyear_col_name_prev])
-top10_takes_last_six_months = top10_takes_last_six_months.rename(columns={halfyear_col_name:file_list[num_obs-1][5:], halfyear_col_name_prev:file_list[num_obs-2][5:]})
-print_df(top10_takes_last_six_months,"top10_takes_last_six_months")
+print_df(turfdata.top10_takes_last_six_months,"top10_takes_last_six_months")
 
 print_df(turfdata.num_zones_changed,"num_zones_changed")
 
@@ -118,8 +91,8 @@ style_small_title = styles['Heading2']
 
 
 # Create content for the report
-heading = Paragraph(f"Turfrapport {turfname} {manad_lista[manad-1]} {artal}", style_title)
-zone_list = top10_takes_last_six_months.index.values
+heading = Paragraph(f"Turfrapport {turfdata.turfname} {manad_lista[turfdata.manad-1]} {turfdata.artal}", style_title)
+#zone_list = turfdata.top10_takes_last_six_months.index.values
 #print(zone_list)
 
 #zone_list = list()
@@ -127,33 +100,6 @@ zone_list = top10_takes_last_six_months.index.values
 #    zone_name = df[df['takes202210halfyear']==top10_takes_last_six_months[0]].index[0]
 #else:
 #    zone_name = ""
-total_t0 = turfdata.df_count_takes_trans['Totalt'].iloc[num_obs-1]
-gron_t0 =  turfdata.df_count_takes_trans['1'].iloc[num_obs-1]
-gul_t0 =  turfdata.df_count_takes_trans['2 - 10'].iloc[num_obs-1]
-orange_t0 = turfdata.df_count_takes_trans['11 - 20'].iloc[num_obs-1]
-rod_t0 = turfdata.df_count_takes_trans['21 - 50'].iloc[num_obs-1]
-
-total_t1 = turfdata.df_count_takes_trans['Totalt'].iloc[num_obs-2]
-gron_t1 =  turfdata.df_count_takes_trans['1'].iloc[num_obs-2]
-gul_t1 =  turfdata.df_count_takes_trans['2 - 10'].iloc[num_obs-2]
-orange_t1 = turfdata.df_count_takes_trans['11 - 20'].iloc[num_obs-2]
-rod_t1 = turfdata.df_count_takes_trans['21 - 50'].iloc[num_obs-2]
-
-total_t2 = turfdata.df_count_takes_trans['Totalt'].iloc[num_obs-3]
-gron_t2 =  turfdata.df_count_takes_trans['1'].iloc[num_obs-3]
-gul_t2 =  turfdata.df_count_takes_trans['2 - 10'].iloc[num_obs-3]
-orange_t2 = turfdata.df_count_takes_trans['11 - 20'].iloc[num_obs-3]
-rod_t2 = turfdata.df_count_takes_trans['21 - 50'].iloc[num_obs-3]
-
-total_t3 = turfdata.df_count_takes_trans['Totalt'].iloc[num_obs-4]
-gron_t3 =  turfdata.df_count_takes_trans['1'].iloc[num_obs-4]
-gul_t3 =  turfdata.df_count_takes_trans['2 - 10'].iloc[num_obs-4]
-orange_t3 = turfdata.df_count_takes_trans['11 - 20'].iloc[num_obs-4]
-rod_t3 = turfdata.df_count_takes_trans['21 - 50'].iloc[num_obs-4]
-
-nya_unika_t0 = total_t0 - total_t1
-nya_unika_t1 = total_t1 - total_t2
-nya_unika_t2 = total_t2 - total_t3
 
 num_obs_turfdata = turfdata.df_turfdata_trans.shape[0]
 
@@ -175,22 +121,15 @@ nya_ftt_t0 = ftt_t0 - ftt_t1
 nya_turfare_t1 = unika_turfare_t1 - unika_turfare_t2
 nya_assist_t1 = unika_assist_t1 - unika_assist_t2
 
-print(f" {num_regions_total} - {num_regions_total_prev} - {num_regions_total_2prev}")
+print(f" {turfdata.num_regions_total} - {turfdata.num_regions_total_prev} - {turfdata.num_regions_total_2prev}")
 
 print("Test top 10")
 print("===========")
-print(top10_takes_last_six_months)
+print(turfdata.top10_takes_last_six_months)
 print("---")
-print(top10_takes_last_six_months.iloc[0])
-print(int((top10_takes_last_six_months.iloc[0]).iloc[0]))
-introtext=create_introtext(turfname, turfdata.takes_total, turfdata.num_zones_total, num_regions_total)
-introtext = introtext + f"Under de senaste 6 månadernas turfande för {turfname} var {top10_takes_last_six_months.index.values[0]} den vanligaste zonen med {int((top10_takes_last_six_months.iloc[0]).iloc[0])} besök. "
-if(top10_takes_last_six_months.index.values[0] == top10_takes_total.index.values[0]):
-    introtext = introtext + f" Även den totalt vanligaste zonen under turfkariären är {top10_takes_total.index.values[0]} med totalt {top10_takes_total.iloc[0]} besök."
-else:
-    introtext = introtext + f" Den totalt sett vanligaste zonen under turfkariären är {top10_takes_total.index.values[0]} med totalt {top10_takes_total.iloc[0]} besök."
-introtext = introtext + f" Totalt togs {nya_unika_t0} nya unika zoner under {period_text}, jämfört med {nya_unika_t1} under halvåret innan. "
-introtext = introtext + f" Den nya zon som togs flest gånger under halvåret var {top10_takes_new.index.values[0]} med {top10_takes_new.iloc[0]} besök.\n\n"
+print(turfdata.top10_takes_last_six_months.iloc[0])
+print(int((turfdata.top10_takes_last_six_months.iloc[0]).iloc[0]))
+introtext=create_introtext(turfdata)
 introtext = introtext + f" Totalt har zoner tagits från {unika_turfare_t0} olika turfare, en ökning med {nya_turfare_t0} under senaste halvåret.\n\n"
 if(turfdata.num_sv_areas_100>0):
     if (turfdata.num_sv_areas_100 == 1):
@@ -291,15 +230,15 @@ diagram_251ochmer = Image("251ochmer.png", width = 14*cm, height = 8 * cm)
 
 halfyear_heading = Paragraph("Senaste 6 månadernas turfande", style_small_title)
 
-halfyeartext = f"Under de senaste 6 månadernas turfande gjordes totalt {turfdata.takes_halfyear} besök vid {turfdata.num_zones_halfyear} olika zoner i {num_regions_halfyear} olika regioner och {num_areas_halfyear} olika areor (motsvarande kommuner). "
-if num_regions_new>0:
-    if num_regions_2new>0:
-        halfyeartext = halfyeartext + f" {num_regions_new} av dessa regioner var helt nya, jämfört med {num_regions_2new} föregående halvår. "
+halfyeartext = f"Under de senaste 6 månadernas turfande gjordes totalt {turfdata.takes_halfyear} besök vid {turfdata.num_zones_halfyear} olika zoner i {turfdata.num_regions_halfyear} olika regioner och {turfdata.num_areas_halfyear} olika areor (motsvarande kommuner). "
+if turfdata.num_regions_new>0:
+    if turfdata.num_regions_2new>0:
+        halfyeartext = halfyeartext + f" {turfdata.num_regions_new} av dessa regioner var helt nya, jämfört med {turfdata.num_regions_2new} föregående halvår. "
     else:
-        halfyeartext = halfyeartext + f" {num_regions_new} av dessa regioner var helt nya. "
+        halfyeartext = halfyeartext + f" {turfdata.num_regions_new} av dessa regioner var helt nya. "
 else:
-    if num_regions_2new>0:
-        halfyeartext = halfyeartext + f" Det var inga nya regioner det senaste halvåret, men {num_regions_2new} var nya föregående halvår. "
+    if turfdata.num_regions_2new>0:
+        halfyeartext = halfyeartext + f" Det var inga nya regioner det senaste halvåret, men {turfdata.num_regions_2new} var nya föregående halvår. "
 halfyeartext = halfyeartext + f"Av besöken detta halvår gjordes totalt {turfdata.takes_newzones} besök vid {turfdata.num_zones_newzones} nya zoner. "
 #halfyeartext = halfyeartext + f"Motsvarande halvår för ett år sedan var det {takes_newzones_prev2} besök vid {num_zones_newzones} nya zoner. "
 
@@ -319,7 +258,7 @@ halfyeartext=halfyeartext.replace('\n','<br />\n')
 halfyear_paragraph = Paragraph(halfyeartext, style_normal)
 
 
-table_halfyear_data = [("Zon", table_period_now, table_period_prev)] + [[index] + list(row) for index, row in top10_takes_last_six_months.iterrows()]
+table_halfyear_data = [("Zon", table_period_now, table_period_prev)] + [[index] + list(row) for index, row in turfdata.top10_takes_last_six_months.iterrows()]
 table_halfyear = Table(table_halfyear_data)
 table_halfyear.setStyle(style_top10)
 
@@ -330,7 +269,7 @@ diagram_nyazoner = Image("nyazoner.png", width = 14*cm, height = 7 * cm)
 newtext = f"Under de senaste sex månaderna har följande tio nya zoner tagits flest gånger. \n\n"
 new_paragraph = Paragraph(newtext,style_normal)
 
-table_new_data = [("Zon", "Besök")] + [(idx, val) for idx, val in top10_takes_new.items()]
+table_new_data = [("Zon", "Besök")] + [(idx, val) for idx, val in turfdata.top10_takes_new.items()]
 table_new = Table(table_new_data)
 table_new.setStyle(style_top10)
 
@@ -338,7 +277,7 @@ table_new.setStyle(style_top10)
 totaltext = f"De 10 zoner som tagits mest totalt är"
 total_paragraph = Paragraph(totaltext,style_normal)
 
-table_total_data = [("Zon", "Besök")] + [(idx, val) for idx, val in top10_takes_total.items()]
+table_total_data = [("Zon", "Besök")] + [(idx, val) for idx, val in turfdata.top10_takes_total.items()]
 table_total = Table(table_total_data)
 table_total.setStyle(style_top10)
 
