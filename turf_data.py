@@ -80,6 +80,27 @@ class TurfData:
         self.nya_unika_t1 = total_t1 - total_t2
         self.nya_unika_t2 = total_t2 - total_t3
 
+    def count_unique_turfers(self, file_list):
+        num_obs_turfdata = self.df_turfdata_trans.shape[0]
+
+        self.unika_turfare_t0 = int(self.df_turfdata_trans['uniqueturfers'].iloc[num_obs_turfdata-1])
+        self.unika_assist_t0 = int(self.df_turfdata_trans['uniqueassists'].iloc[num_obs_turfdata-1])
+        self.ftt_t0 = int(self.df_turfdata_trans['ftt'].iloc[num_obs_turfdata-1])
+
+        self.unika_turfare_t1 = int(self.df_turfdata_trans['uniqueturfers'].iloc[num_obs_turfdata-2])
+        self.unika_assist_t1 = int(self.df_turfdata_trans['uniqueassists'].iloc[num_obs_turfdata-2])
+        self.ftt_t1 = int(self.df_turfdata_trans['ftt'].iloc[num_obs_turfdata-2])
+
+        self.unika_turfare_t2 = self.df_turfdata_trans['uniqueturfers'].iloc[num_obs_turfdata-3]
+        self.unika_assist_t2 = self.df_turfdata_trans['uniqueassists'].iloc[num_obs_turfdata-3]
+        self.ftt_t3 = int(self.df_turfdata_trans['ftt'].iloc[num_obs_turfdata-3])
+
+        self.nya_turfare_t0 = self.unika_turfare_t0 - self.unika_turfare_t1
+        self.nya_assist_t0 = self.unika_assist_t0 - self.unika_assist_t1
+        self.nya_ftt_t0 = self.ftt_t0 - self.ftt_t1
+        self.nya_turfare_t1 = self.unika_turfare_t1 - self.unika_turfare_t2
+        self.nya_assist_t1 = self.unika_assist_t1 - self.unika_assist_t2
+        
 
     def create_df_countries_regions(self,file_list):
         num_obs = len(file_list)

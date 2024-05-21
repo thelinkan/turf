@@ -74,6 +74,7 @@ turfdata.df_regions.to_excel("c:/temp/df_regions.xlsx")
 
 turfdata.create_top10s(file_list)
 turfdata.count_unique_zones(file_list)
+turfdata.count_unique_turfers(file_list)
 
 print_df(turfdata.top10_takes_last_six_months,"top10_takes_last_six_months")
 
@@ -92,34 +93,6 @@ style_small_title = styles['Heading2']
 
 # Create content for the report
 heading = Paragraph(f"Turfrapport {turfdata.turfname} {manad_lista[turfdata.manad-1]} {turfdata.artal}", style_title)
-#zone_list = turfdata.top10_takes_last_six_months.index.values
-#print(zone_list)
-
-#zone_list = list()
-#if len(df[df['takes202210halfyear']==top10_takes_last_six_months[0]].index) > 0:
-#    zone_name = df[df['takes202210halfyear']==top10_takes_last_six_months[0]].index[0]
-#else:
-#    zone_name = ""
-
-num_obs_turfdata = turfdata.df_turfdata_trans.shape[0]
-
-unika_turfare_t0 = int(turfdata.df_turfdata_trans['uniqueturfers'].iloc[num_obs_turfdata-1])
-unika_assist_t0 = int(turfdata.df_turfdata_trans['uniqueassists'].iloc[num_obs_turfdata-1])
-ftt_t0 = int(turfdata.df_turfdata_trans['ftt'].iloc[num_obs_turfdata-1])
-
-unika_turfare_t1 = int(turfdata.df_turfdata_trans['uniqueturfers'].iloc[num_obs_turfdata-2])
-unika_assist_t1 = int(turfdata.df_turfdata_trans['uniqueassists'].iloc[num_obs_turfdata-2])
-ftt_t1 = int(turfdata.df_turfdata_trans['ftt'].iloc[num_obs_turfdata-2])
-
-unika_turfare_t2 = turfdata.df_turfdata_trans['uniqueturfers'].iloc[num_obs_turfdata-3]
-unika_assist_t2 = turfdata.df_turfdata_trans['uniqueassists'].iloc[num_obs_turfdata-3]
-ftt_t3 = int(turfdata.df_turfdata_trans['ftt'].iloc[num_obs_turfdata-3])
-
-nya_turfare_t0 = unika_turfare_t0 - unika_turfare_t1
-nya_assist_t0 = unika_assist_t0 - unika_assist_t1
-nya_ftt_t0 = ftt_t0 - ftt_t1
-nya_turfare_t1 = unika_turfare_t1 - unika_turfare_t2
-nya_assist_t1 = unika_assist_t1 - unika_assist_t2
 
 print(f" {turfdata.num_regions_total} - {turfdata.num_regions_total_prev} - {turfdata.num_regions_total_2prev}")
 
@@ -129,43 +102,13 @@ print(turfdata.top10_takes_last_six_months)
 print("---")
 print(turfdata.top10_takes_last_six_months.iloc[0])
 print(int((turfdata.top10_takes_last_six_months.iloc[0]).iloc[0]))
-introtext=create_introtext(turfdata)
-introtext = introtext + f" Totalt har zoner tagits från {unika_turfare_t0} olika turfare, en ökning med {nya_turfare_t0} under senaste halvåret.\n\n"
-if(turfdata.num_sv_areas_100>0):
-    if (turfdata.num_sv_areas_100 == 1):
-        text_kommun = "kommun"
-        text_svensk = "svensk"
-    else:
-        text_kommun = "kommuner"
-        text_svensk = "svenska"
-    if (turfdata.num_sv_areas_80_100 == 1):
-        text_kommun_80 = "kommun"
-    else:
-        text_kommun_80 = "kommuner"
-    introtext = introtext + f" {turfname} har besökt alla zoner i {turfdata.num_sv_areas_100} {text_svensk} {text_kommun}."
-    introtext = introtext + f" Därutöver har han besökt minst 80 procent av zonerna i {turfdata.num_sv_areas_80_100} {text_kommun_80} och " 
-    introtext = introtext + f" minst 50 procent av zonerna (men mindre än 80 procent) i {turfdata.num_sv_areas_50_80} kommuner. " 
-else:
-    if (turfdata.num_sv_areas_80_100 == 1):
-        text_kommun = "kommun"
-    else:
-        text_kommun = "kommuner"
-    introtext = introtext + f" {turfname} har för näravarande inte besökt alla zoner i svensk någon kommun. " 
-    introtext = introtext + f" Däremot har han besökt minst 80 procent av zonerna i {turfdata.num_sv_areas_80_100} {text_kommun}. " 
-    introtext = introtext + f" Därutöver har han besökt minst 50 procent av zonerna (men mindre än 80 procent) i {turfdata.num_sv_areas_50_80} kommuner. " 
+#introtext=create_introtext(turfdata)
 
-introtext = introtext.replace('\n','<br />\n')
-
-intro_paragraph = Paragraph(introtext, style_normal)
+intro_paragraph = Paragraph(create_introtext(turfdata), style_normal)
 
 wardedfarger_heading = Paragraph("Wardedfärger", style_small_title)
 
-wardedtext = "I detta avsnitt kommer information om hur många zoner som har respektive wardedfärg. "
-wardedtext = wardedtext + "Förutom de vanliga färgerna grön, gul, röd och lila, så har de lila zonerna delats upp i 51-100, 101-250, 251-500, 501-1000 och 1001+. "
-wardedtext = wardedtext + "Ibland kan antalet zoner i en grupp minska, det beror på att fler zoner har flyttats upp en nivå, än som har tillkommit i den aktuella nivån. "
-wardedtext = wardedtext + "\n\n"
-wardedtext = wardedtext.replace('\n','<br />\n')
-warded_paragraph = Paragraph(wardedtext, style_normal)
+warded_paragraph = Paragraph(create_introtext(turfdata), style_normal)
 
 #df_wardedfarger = turfdata.df_count_takes.iloc[:,-6:]
 #table_wardedfarger_data = [list(df_wardedfarger.columns)] + [list(row) for row in df_wardedfarger.values]
@@ -243,8 +186,8 @@ halfyeartext = halfyeartext + f"Av besöken detta halvår gjordes totalt {turfda
 #halfyeartext = halfyeartext + f"Motsvarande halvår för ett år sedan var det {takes_newzones_prev2} besök vid {num_zones_newzones} nya zoner. "
 
 
-if nya_ftt_t0>0:
-    halfyeartext = halfyeartext + f" Du lyckades vara den första turfaren att ta {nya_ftt_t0} zoner (så kallad ftt).\n\n "
+if turfdata.nya_ftt_t0>0:
+    halfyeartext = halfyeartext + f" Du lyckades vara den första turfaren att ta {turfdata.nya_ftt_t0} zoner (så kallad ftt).\n\n "
 else:
     halfyeartext = halfyeartext + f" Du lyckades inte vara den första turfaren att ta några zoner det senaste halvåret. \n\n"
 
@@ -283,9 +226,9 @@ table_total.setStyle(style_top10)
 
 interkationer_heading = Paragraph("Interaktioner", style_small_title)
 
-interaktionertext = f" Totalt har zoner tagits från {unika_turfare_t0} olika turfare, varav {nya_turfare_t0} var nya unika turfare {period_text}."
-interaktionertext = interaktionertext + f" Under halvåret innan ökade antalet unika turfare med {nya_turfare_t1}."
-interaktionertext = interaktionertext + f" Antalet unika turfare som har assistats har ökat från {unika_assist_t1} till {unika_assist_t0}."
+interaktionertext = f" Totalt har zoner tagits från {turfdata.unika_turfare_t0} olika turfare, varav {turfdata.nya_turfare_t0} var nya unika turfare {period_text}."
+interaktionertext = interaktionertext + f" Under halvåret innan ökade antalet unika turfare med {turfdata.nya_turfare_t1}."
+interaktionertext = interaktionertext + f" Antalet unika turfare som har assistats har ökat från {turfdata.unika_assist_t1} till {turfdata.unika_assist_t0}."
 
 interkationer_paragraph = Paragraph(interaktionertext,style_normal)
 
