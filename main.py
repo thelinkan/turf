@@ -12,7 +12,8 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle, 
 
 from format_data import takes_data, plot_series, plot_stacked_series
 from console_output import print_df
-from report_text import create_introtext, create_wardedtext, periodtext, periodtext_kort, prev_period
+from report_text import create_introtext, create_wardedtext, create_halfyeartext, create_newtext, create_totaltext, create_interactiontext
+from report_text import periodtext, periodtext_kort, prev_period
 from turf_data import TurfData
 from styles import style, style_top10, styles, style_normal,style_small_title,style_title
 
@@ -103,9 +104,6 @@ wardedfarger_heading = Paragraph("Wardedfärger", style_small_title)
 
 warded_paragraph = Paragraph(create_wardedtext(turfdata), style_normal)
 
-#df_wardedfarger = turfdata.df_count_takes.iloc[:,-6:]
-#table_wardedfarger_data = [list(df_wardedfarger.columns)] + [list(row) for row in df_wardedfarger.values]
-#table_wardedfarger_data.insert(0, [''] + list(df_wardedfarger.rows))
 table_wardedfarger_data = [[index] + list(row) for index, row in turfdata.df_wardedfarger.iterrows()]
 # Include the column names as the first row in the table data.
 table_wardedfarger_data.insert(0, [''] + list(turfdata.df_wardedfarger.columns))
@@ -117,7 +115,6 @@ print(table_wardedfarger_data)
 print("")
 
 table_wardedfarger = Table(table_wardedfarger_data)
-# Add style to the table
 # Apply style to the table
 table_wardedfarger.setStyle(style)
 
@@ -129,33 +126,7 @@ plot_series(turfdata.df_count_takes_trans['251 - 500'],turfdata.df_count_takes_t
 diagram_251ochmer = Image("251ochmer.png", width = 14*cm, height = 8 * cm)
 
 halfyear_heading = Paragraph("Senaste 6 månadernas turfande", style_small_title)
-
-halfyeartext = f"Under de senaste 6 månadernas turfande gjordes totalt {turfdata.takes_halfyear} besök vid {turfdata.num_zones_halfyear} olika zoner i {turfdata.num_regions_halfyear} olika regioner och {turfdata.num_areas_halfyear} olika areor (motsvarande kommuner). "
-if turfdata.num_regions_new>0:
-    if turfdata.num_regions_2new>0:
-        halfyeartext = halfyeartext + f" {turfdata.num_regions_new} av dessa regioner var helt nya, jämfört med {turfdata.num_regions_2new} föregående halvår. "
-    else:
-        halfyeartext = halfyeartext + f" {turfdata.num_regions_new} av dessa regioner var helt nya. "
-else:
-    if turfdata.num_regions_2new>0:
-        halfyeartext = halfyeartext + f" Det var inga nya regioner det senaste halvåret, men {turfdata.num_regions_2new} var nya föregående halvår. "
-halfyeartext = halfyeartext + f"Av besöken detta halvår gjordes totalt {turfdata.takes_newzones} besök vid {turfdata.num_zones_newzones} nya zoner. "
-#halfyeartext = halfyeartext + f"Motsvarande halvår för ett år sedan var det {takes_newzones_prev2} besök vid {num_zones_newzones} nya zoner. "
-
-
-if turfdata.nya_ftt_t0>0:
-    halfyeartext = halfyeartext + f" Du lyckades vara den första turfaren att ta {turfdata.nya_ftt_t0} zoner (så kallad ftt).\n\n "
-else:
-    halfyeartext = halfyeartext + f" Du lyckades inte vara den första turfaren att ta några zoner det senaste halvåret. \n\n"
-
-if(turfdata.num_zones_changed>0):
-    halfyeartext = halfyeartext + f"Antalet besök i de nya zonerna kan vara något överskattad, då {turfdata.num_zones_changed} zoner antingen har bytt "
-    halfyeartext = halfyeartext + f"namn under det senaste halvåret eller tagits bort utan att det kunnat korrigeras för. \n\n"
-
-halfyeartext = halfyeartext + f"Tabellen nedan visar hur många gånger {turfname} besökt var och en av de tio zoner som besökts mest under de senaste sex månaderna,"
-halfyeartext = halfyeartext + f"samt hur många besök som gjorts i respektive zon de föregående sex månaderna. \n\n"
-halfyeartext=halfyeartext.replace('\n','<br />\n')
-halfyear_paragraph = Paragraph(halfyeartext, style_normal)
+halfyear_paragraph = Paragraph(create_halfyeartext(turfdata), style_normal)
 
 
 table_halfyear_data = [("Zon", table_period_now, table_period_prev)] + [[index] + list(row) for index, row in turfdata.top10_takes_last_six_months.iterrows()]
@@ -164,30 +135,20 @@ table_halfyear.setStyle(style_top10)
 
 plot_series(turfdata.df_count_takes_trans['Nya'], filename = 'nyazoner.png', title='Nya unika zoner', xlabel='halvår', ylabel='Antal')
 diagram_nyazoner = Image("nyazoner.png", width = 14*cm, height = 7 * cm)
-
-
-newtext = f"Under de senaste sex månaderna har följande tio nya zoner tagits flest gånger. \n\n"
-new_paragraph = Paragraph(newtext,style_normal)
+new_paragraph = Paragraph(create_newtext(turfdata),style_normal)
 
 table_new_data = [("Zon", "Besök")] + [(idx, val) for idx, val in turfdata.top10_takes_new.items()]
 table_new = Table(table_new_data)
 table_new.setStyle(style_top10)
 
-
-totaltext = f"De 10 zoner som tagits mest totalt är"
-total_paragraph = Paragraph(totaltext,style_normal)
+total_paragraph = Paragraph(create_totaltext(turfdata),style_normal)
 
 table_total_data = [("Zon", "Besök")] + [(idx, val) for idx, val in turfdata.top10_takes_total.items()]
 table_total = Table(table_total_data)
 table_total.setStyle(style_top10)
 
 interkationer_heading = Paragraph("Interaktioner", style_small_title)
-
-interaktionertext = f" Totalt har zoner tagits från {turfdata.unika_turfare_t0} olika turfare, varav {turfdata.nya_turfare_t0} var nya unika turfare {period_text}."
-interaktionertext = interaktionertext + f" Under halvåret innan ökade antalet unika turfare med {turfdata.nya_turfare_t1}."
-interaktionertext = interaktionertext + f" Antalet unika turfare som har assistats har ökat från {turfdata.unika_assist_t1} till {turfdata.unika_assist_t0}."
-
-interkationer_paragraph = Paragraph(interaktionertext,style_normal)
+interkationer_paragraph = Paragraph(create_interactiontext(turfdata),style_normal)
 
 plot_series(turfdata.df_turfdata_trans['uniqueturfers'], filename = 'unikaturfare.png', title='Unika turfare', xlabel='halvår', ylabel='Antal')
 unikaturfare = Image("unikaturfare.png", width = 14*cm, height = 8 * cm)
