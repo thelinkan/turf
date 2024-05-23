@@ -151,15 +151,12 @@ interkationer_heading = Paragraph("Interaktioner", style_small_title)
 interkationer_paragraph = Paragraph(create_interactiontext(turfdata),style_normal)
 
 regional_heading = Paragraph("Regionala data", style_small_title)
-regional_paragraph = Paragraph(create_regionaltext(turfdata),style_normal)
-
+regional_paragraph = Paragraph(create_regionaltext(turfdata, file_list),style_normal)
 
 plot_series(turfdata.df_turfdata_trans['uniqueturfers'], filename = 'unikaturfare.png', title='Unika turfare', xlabel='halvår', ylabel='Antal')
 diagram_unikaturfare = Image("unikaturfare.png", width = 14*cm, height = 8 * cm)
 plot_series(turfdata.df_turfdata_trans['uniqueassists'], filename = 'unikaassist.png', title='Unika assisterade turfare', xlabel='halvår', ylabel='Antal')
 diagram_unikaassist = Image("unikaassist.png", width = 14*cm, height = 8 * cm)
-
-
 
 # Build the report content
 flowables = [heading, intro_paragraph, wardedfarger_heading, warded_paragraph, table_wardedfarger,
