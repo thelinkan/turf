@@ -104,15 +104,39 @@ class TurfData:
 
     def create_df_countries_regions(self,file_list):
         num_obs = len(file_list)
-
-        dfa = self.df_takes.loc[self.df_takes[file_list[num_obs-1]]>0]
-        self.df_countries = pd.DataFrame.from_dict(dfa['Country'].value_counts())
-        self.df_countries.rename(columns = {'count':'tot'}, inplace=True)
-        for i in range(1,num_obs):
+        #dfa = self.df_takes.loc[self.df_takes[file_list[num_obs-1]]>0]
+        dfa = self.df_takes_halfyear.loc[(self.df_takes['Country']!='None') & (self.df_takes['Country']!='se')]
+        self.df_countries_off = pd.DataFrame.from_dict(dfa['Country'].value_counts())
+        self.df_countries_off.rename(columns = {'count':'tot'}, inplace=True)
+        for i in range(1,num_obs+1):
             dfa = self.df_takes.loc[self.df_takes[file_list[i-1]]>0]
             df_countries_b = pd.DataFrame.from_dict(dfa['Country'].value_counts())
-            df_countries_b.rename(columns = {'count':file_list[i-1]}, inplace=True)
-            self.df_countries = self.df_countries.join(df_countries_b)
+
+            df_countries_b.rename(columns = {'count':f'zones{file_list[i-1][5:]}'}, inplace=True)
+            self.df_countries_off = self.df_countries_off.join(df_countries_b)
+
+        self.df_countries_off = self.df_countries_off.fillna(0)
+        self.num_countries_off = (self.df_countries_off[self.df_countries_off.columns[-1]] > 0).sum()
+        self.num_zones_off = (self.df_countries_off[self.df_countries_off.columns[-1]].sum())
+
+        dfa = self.df_takes_halfyear.loc[self.df_takes['Country']=='None']
+        self.df_countries_nonoff = pd.DataFrame.from_dict(dfa['Region'].value_counts())
+        for i in range(1,num_obs+1):
+            dfa = self.df_takes.loc[self.df_takes[file_list[i-1]]>0]
+            df_countries_nonoff_b = pd.DataFrame.from_dict(dfa['Region'].value_counts())
+            df_countries_nonoff_b.rename(columns = {'count':f'zones{file_list[i-1][5:]}'}, inplace=True)
+            self.df_countries_nonoff = self.df_countries_nonoff.join(df_countries_nonoff_b)
+        
+        self.df_countries_nonoff = self.df_countries_nonoff.fillna(0)
+        self.num_countries_nonoff = (self.df_countries_nonoff[self.df_countries_nonoff.columns[-1]] > 0).sum()
+        self.num_zones_nonoff = (self.df_countries_nonoff[self.df_countries_nonoff.columns[-1]].sum())
+
+        
+
+
+        print("regioner och zoner utanför Sverige")
+        print(f"Länder: {self.num_countries_off} officiella och  {self.num_countries_nonoff} inofficiella - zoner: {self.num_zones_off} respektive {self.num_zones_nonoff}")
+        #print(self.df_countries_nonoff)
 
         self.df_regions = pd.DataFrame.from_dict(self.df_takes['Region'].value_counts())
         self.df_regions.rename(columns = {'count':'Total'}, inplace=True)

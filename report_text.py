@@ -1,6 +1,6 @@
 def create_introtext(turfdata):
 
-    introtext = f"{turfdata.turfname} har gjort totalt {turfdata.takes_total} takes i {turfdata.num_zones_total} unika zoner i {turfdata.num_regions_total} olika regioner. "
+    introtext = f"{turfdata.turfname} har gjort totalt {turfdata.takes_total} besök i {turfdata.num_zones_total} unika zoner i {turfdata.num_regions_total} olika regioner. "
     introtext = introtext + f"Under de senaste 6 månadernas turfande för {turfdata.turfname} var {turfdata.top10_takes_last_six_months.index.values[0]} "
     introtext = introtext + f"den vanligaste zonen med {int((turfdata.top10_takes_last_six_months.iloc[0]).iloc[0])} besök. "
     if(turfdata.top10_takes_last_six_months.index.values[0] == turfdata.top10_takes_total.index.values[0]):
@@ -64,7 +64,7 @@ def create_totaltext(turfdata):
 def create_interactiontext(turfdata):
     interaktionertext = f" Totalt har zoner tagits från {turfdata.unika_turfare_t0} olika turfare, varav {turfdata.nya_turfare_t0} "
     interaktionertext = interaktionertext + f"var nya unika turfare {periodtext(turfdata.artal,turfdata.manad)}."
-    interaktionertext = interaktionertext + f" Under halvåret innan ökade antalet unika turfare med {turfdata.nya_turfare_t1}."
+    interaktionertext = interaktionertext + f" Under halvåret innan ökade antalet unika turfare med {int(turfdata.nya_turfare_t1)}."
     interaktionertext = interaktionertext + f" Antalet unika turfare som har assistats har ökat från {turfdata.unika_assist_t1} till {turfdata.unika_assist_t0}."
     return interaktionertext
 
@@ -97,7 +97,7 @@ def create_regionaltext(turfdata, file_list):
             text_kommun_80 = "kommuner"
         regionaltext = regionaltext + f" {turfdata.turfname} har besökt alla zoner i {turfdata.num_sv_areas_100} {text_svensk} {text_kommun}."
         regionaltext = regionaltext + f" Därutöver har han besökt minst 80 procent av zonerna i {turfdata.num_sv_areas_80_100} {text_kommun_80} och " 
-        regionaltext = regionaltext + f" minst 50 procent av zonerna (men mindre än 80 procent) i {turfdata.num_sv_areas_50_80} kommuner. " 
+        regionaltext = regionaltext + f" minst 50 procent av zonerna (men mindre än 80 procent) i {turfdata.num_sv_areas_50_80} kommuner. \n\n" 
     else:
         if (turfdata.num_sv_areas_80_100 == 1):
             text_kommun = "kommun"
@@ -105,7 +105,12 @@ def create_regionaltext(turfdata, file_list):
             text_kommun = "kommuner"
         regionaltext = regionaltext + f" {turfdata.turfname} har för näravarande inte besökt alla zoner i svensk någon kommun. " 
         regionaltext = regionaltext + f" Däremot har han besökt minst 80 procent av zonerna i {turfdata.num_sv_areas_80_100} {text_kommun}. " 
-        regionaltext = regionaltext + f" Därutöver har han besökt minst 50 procent av zonerna (men mindre än 80 procent) i {turfdata.num_sv_areas_50_80} kommuner. " 
+        regionaltext = regionaltext + f" Därutöver har han besökt minst 50 procent av zonerna (men mindre än 80 procent) i {turfdata.num_sv_areas_50_80} kommuner. \n\n" 
+
+    regionaltext = regionaltext + f" {turfdata.turfname} har besökt totalt {turfdata.num_zones_off} zoner i {turfdata.num_countries_off} olika officiella turfländer. "
+    regionaltext = regionaltext + f" Därutöver har totalt {turfdata.num_zones_nonoff} zoner besökts i {turfdata.num_countries_nonoff} olika inofficiella turfländer. "
+     
+    
     regionaltext = regionaltext.replace('\n','<br />\n')
 
     return regionaltext

@@ -50,8 +50,9 @@ print_df(turfdata.df_takes_halfyear,"df_halfyear - class")
 # Länder och regioner
 turfdata.create_df_countries_regions(file_list)
 
-print_df(turfdata.df_countries,"df_countries")
+print_df(turfdata.df_countries_off,"df_countries_off")
 print_df(turfdata.df_sverige_areas,"df_sverige_areas")
+turfdata.df_sverige_areas.to_excel("c:/temp/df_sverige_areas.xlsx")
 
 print(f"100% - {turfdata.num_sv_areas_100}")
 print(f"80% - 100% - {turfdata.num_sv_areas_80_100}")
