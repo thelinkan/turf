@@ -14,11 +14,13 @@ def create_introtext(turfdata):
     introtext = introtext + f" Den nya zon som togs flest gånger under halvåret var {turfdata.top10_takes_new.index.values[0]} "
     introtext = introtext + f"med {turfdata.top10_takes_new.iloc[0]} besök.\n\n"
     introtext = introtext + f" Totalt har zoner tagits från {turfdata.unika_turfare_t0} olika turfare, en ökning med {turfdata.nya_turfare_t0} under senaste halvåret.\n\n"
-    introtext = introtext + f" {turfdata.num_hotzones} zoner är högtrafikszoner, dvs {turfdata.turfname} har tagit de zonerna minst 50 gånger varje halvår de senaste 4 halvåren. "
-    introtext = introtext + f" Därutöver är {turfdata.num_freqzones} zoner frekvent besökta (minst 20 besök per halvår de senaste 4 halvåren, men inte högtrafikszon) v"
-    introtext = introtext + f" och {turfdata.num_regularzones} zoner är besökta minst 5 gånger per halvår de senaste 4 halvåren, men inte frekvent eller högtrafik.\n\n"
-    introtext = introtext + f" {turfdata.num_coldzones} zoner är kalla zoner. De har besökts minst 101 gånger var totalt, men de senaste 4 halvåren har det blivit som mest "
+    introtext = introtext + f" {turfdata.num_hotzones} zoner är högtrafikszoner, dvs {turfdata.turfname} har tagit de zonerna minst 50 gånger varje halvår de senaste fyra halvåren. "
+    introtext = introtext + f" Därutöver är {turfdata.num_freqzones} zoner frekvent besökta (minst 20 besök per halvår de senaste fyra halvåren, men inte högtrafikszon) v"
+    introtext = introtext + f" och {turfdata.num_regularzones} zoner är besökta minst 5 gånger per halvår de senaste fyra halvåren, men inte frekvent eller högtrafik.\n\n"
+    introtext = introtext + f" {turfdata.num_coldzones} zoner är kalla zoner. De har besökts minst 101 gånger var totalt, men de senaste fyra halvåren har det blivit som mest "
     introtext = introtext + f" ett besök varje halvår. \n\n"
+    introtext = introtext + f" {turfdata.turfname} har varit en dominant besökare i {turfdata.num_zones_33percent} zoner."
+    introtext = introtext + f" En turfare räknas som dominant besökare om hen har varit närvarande vid minst 33 procent av alla besökstillfällen. \n\n"
 
     introtext = introtext.replace('\n','<br />\n')
     return introtext

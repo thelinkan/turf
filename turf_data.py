@@ -243,3 +243,14 @@ class TurfData:
         self.top10_zones_per_region_halfyear_prev = df_halfyear_regions[halfyear_col_name_prev].nlargest(10).astype(int)
         self.top10_zones_per_region_prev = self.df_regions[col_name_prev].nlargest(10).astype(int)
 
+    def shares(self,file_list):
+        num_obs = len(file_list)
+        col_name = file_list[num_obs-1]
+        df_takes_share = self.df_takes_halfyear[(self.df_takes_halfyear['Takeovers']>0)]
+        df_takes_share['share'] = 100 * df_takes_share[col_name] / df_takes_share['Takeovers']
+        df_takes_share = df_takes_share.sort_values(by=['share'], ascending = False)
+        self.df_takes_share = df_takes_share[(df_takes_share['share'])>=5]
+        self.num_zones_5percent = self.df_takes_share.count()['Country']
+        df_takes_share = df_takes_share[(df_takes_share['share'])>=33]
+        self.num_zones_33percent = df_takes_share.count()['Country']
+        print(f"5: {self.num_zones_5percent} - 33: {self.num_zones_33percent}")
