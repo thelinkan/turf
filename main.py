@@ -96,6 +96,8 @@ print(turfdata.top10_zones_per_region_prev)
 #print(int((turfdata.top10_takes_last_six_months.iloc[0]).iloc[0]))
 #introtext=create_introtext(turfdata)
 
+turfdata.hotzones(file_list)
+
 intro_paragraph = Paragraph(create_introtext(turfdata), style_normal)
 
 wardedfarger_heading = Paragraph("Wardedfärger", style_small_title)

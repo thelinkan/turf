@@ -14,6 +14,12 @@ def create_introtext(turfdata):
     introtext = introtext + f" Den nya zon som togs flest gånger under halvåret var {turfdata.top10_takes_new.index.values[0]} "
     introtext = introtext + f"med {turfdata.top10_takes_new.iloc[0]} besök.\n\n"
     introtext = introtext + f" Totalt har zoner tagits från {turfdata.unika_turfare_t0} olika turfare, en ökning med {turfdata.nya_turfare_t0} under senaste halvåret.\n\n"
+    introtext = introtext + f" {turfdata.num_hotzones} zoner är högtrafikszoner, dvs {turfdata.turfname} har tagit de zonerna minst 50 gånger varje halvår de senaste 4 halvåren. "
+    introtext = introtext + f" Därutöver är {turfdata.num_freqzones} zoner frekvent besökta (minst 20 besök per halvår de senaste 4 halvåren, men inte högtrafikszon) v"
+    introtext = introtext + f" och {turfdata.num_regularzones} zoner är besökta minst 5 gånger per halvår de senaste 4 halvåren, men inte frekvent eller högtrafik.\n\n"
+    introtext = introtext + f" {turfdata.num_coldzones} zoner är kalla zoner. De har besökts minst 101 gånger var totalt, men de senaste 4 halvåren har det blivit som mest "
+    introtext = introtext + f" ett besök varje halvår. \n\n"
+
     introtext = introtext.replace('\n','<br />\n')
     return introtext
 
@@ -107,7 +113,7 @@ def create_regionaltext(turfdata, file_list):
         regionaltext = regionaltext + f" Däremot har han besökt minst 80 procent av zonerna i {turfdata.num_sv_areas_80_100} {text_kommun}. " 
         regionaltext = regionaltext + f" Därutöver har han besökt minst 50 procent av zonerna (men mindre än 80 procent) i {turfdata.num_sv_areas_50_80} kommuner. \n\n" 
 
-    regionaltext = regionaltext + f" {turfdata.turfname} har besökt totalt {turfdata.num_zones_off} zoner i {turfdata.num_countries_off} olika officiella turfländer. "
+    regionaltext = regionaltext + f" {turfdata.turfname} har besökt totalt {turfdata.num_zones_off} zoner i {turfdata.num_countries_off} olika officiella turfländer, utanför Sverige. "
     regionaltext = regionaltext + f" Därutöver har totalt {turfdata.num_zones_nonoff} zoner besökts i {turfdata.num_countries_nonoff} olika inofficiella turfländer. "
      
     

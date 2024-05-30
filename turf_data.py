@@ -111,7 +111,6 @@ class TurfData:
         for i in range(1,num_obs+1):
             dfa = self.df_takes.loc[self.df_takes[file_list[i-1]]>0]
             df_countries_b = pd.DataFrame.from_dict(dfa['Country'].value_counts())
-
             df_countries_b.rename(columns = {'count':f'zones{file_list[i-1][5:]}'}, inplace=True)
             self.df_countries_off = self.df_countries_off.join(df_countries_b)
 
@@ -134,8 +133,8 @@ class TurfData:
         
 
 
-        print("regioner och zoner utanför Sverige")
-        print(f"Länder: {self.num_countries_off} officiella och  {self.num_countries_nonoff} inofficiella - zoner: {self.num_zones_off} respektive {self.num_zones_nonoff}")
+        #print("regioner och zoner utanför Sverige")
+        #print(f"Länder: {self.num_countries_off} officiella och  {self.num_countries_nonoff} inofficiella - zoner: {self.num_zones_off} respektive {self.num_zones_nonoff}")
         #print(self.df_countries_nonoff)
 
         self.df_regions = pd.DataFrame.from_dict(self.df_takes['Region'].value_counts())
@@ -198,7 +197,25 @@ class TurfData:
         self.num_areas_total = (self.df_areas[total_col_name] > 0).sum()
         self.num_areas_halfyear = (self.df_halfyear_areas[self.df_halfyear_areas.columns[-1]] > 0).sum()
         self.num_areas_halfyear_prev = (self.df_halfyear_areas[self.df_halfyear_areas.columns[-2]] > 0).sum()
-    
+
+    def hotzones(self, file_list):
+        num_obs = len(file_list)
+        col_name = file_list[num_obs-1]
+        halfyear_col_name = file_list[num_obs-1]+'halfyear'
+        halfyear_col_name2 = file_list[num_obs-2]+'halfyear'
+        halfyear_col_name3 = file_list[num_obs-3]+'halfyear'
+        halfyear_col_name4 = file_list[num_obs-4]+'halfyear'
+        df_filtered = self.df_takes_halfyear[(self.df_takes_halfyear[halfyear_col_name] >= 50) & (self.df_takes_halfyear[halfyear_col_name2] >= 50) & (self.df_takes_halfyear[halfyear_col_name3] >= 50) & (self.df_takes_halfyear[halfyear_col_name4] >= 50)]
+        self.num_hotzones = df_filtered.count()['Country']
+        df_filtered = self.df_takes_halfyear[(self.df_takes_halfyear[halfyear_col_name] >= 20) & (self.df_takes_halfyear[halfyear_col_name2] >= 20) & (self.df_takes_halfyear[halfyear_col_name3] >= 20) & (self.df_takes_halfyear[halfyear_col_name4] >= 20)]
+        self.num_freqzones = df_filtered.count()['Country']
+        df_filtered = self.df_takes_halfyear[(self.df_takes_halfyear[halfyear_col_name] >= 5) & (self.df_takes_halfyear[halfyear_col_name2] >= 5) & (self.df_takes_halfyear[halfyear_col_name3] >= 5) & (self.df_takes_halfyear[halfyear_col_name4] >= 5)]
+        self.num_regularzones = df_filtered.count()['Country']
+        df_filtered = self.df_takes_halfyear[(self.df_takes_halfyear[col_name] >= 101) & (self.df_takes_halfyear[halfyear_col_name] <= 1) & (self.df_takes_halfyear[halfyear_col_name2] <= 1) & (self.df_takes_halfyear[halfyear_col_name3] <= 1) & (self.df_takes_halfyear[halfyear_col_name4] <= 1)]
+        self.num_coldzones = df_filtered.count()['Country']
+        print(f"{self.num_hotzones} - {self.num_freqzones-self.num_hotzones} - {self.num_regularzones-self.num_freqzones} - {self.num_coldzones}")
+        print(df_filtered)
+
     def create_top10s(self, file_list):
         num_obs = len(file_list)
 
