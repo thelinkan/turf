@@ -220,13 +220,22 @@ class TurfData:
         num_obs = len(file_list)
 
         df_filtered = self.df_takes_halfyear[(self.df_takes_halfyear[file_list[num_obs-2]] == 0) & (self.df_takes_halfyear.iloc[:, -1] > 0)][[self.df_takes_halfyear.columns[-2], self.df_takes_halfyear.columns[-1]]]
+        df_filtered_prev = self.df_takes_halfyear[(self.df_takes_halfyear[file_list[num_obs-3]] == 0) & (self.df_takes_halfyear.iloc[:, -2] > 0)][[self.df_takes_halfyear.columns[-2], self.df_takes_halfyear.columns[-1]]]
 
         halfyear_col_name = file_list[num_obs-1]+'halfyear'
+        halfyear_col_name_prev = file_list[num_obs-2]+'halfyear'
+        col_name = file_list[num_obs-1]
+        col_name_prev = file_list[num_obs-2]
+
         self.top10_takes_last_six_months = self.df_takes_halfyear[halfyear_col_name].nlargest(10).astype(int)
         self.top10_takes_total = self.df_takes[file_list[num_obs-1]].nlargest(10).astype(int)
         self.top10_takes_new = df_filtered[halfyear_col_name].nlargest(10).astype(int)
+        self.num_newzones_green = df_filtered[df_filtered[halfyear_col_name]==1].count()[halfyear_col_name]
+        self.num_newzones_prev = df_filtered_prev.count()[halfyear_col_name]
+        self.num_newzones_prev_revisit = df_filtered_prev[df_filtered_prev[halfyear_col_name]>=1].count()[halfyear_col_name]
+        #print(f"filtered for warded:\n new prev period:{self.num_newzones_prev}\n revisited this period: {self.num_newzones_prev_revisit}")
+        print(f"filtered for warded:\n {df_filtered_prev[df_filtered_prev[halfyear_col_name]>=1]}")
 
-        halfyear_col_name_prev = file_list[num_obs-2]+'halfyear'
         self.top10_takes_last_six_months = pd.DataFrame(self.top10_takes_last_six_months).join(self.df_takes_halfyear[halfyear_col_name_prev])
         self.top10_takes_last_six_months = self.top10_takes_last_six_months.rename(columns={halfyear_col_name:file_list[num_obs-1][5:], halfyear_col_name_prev:file_list[num_obs-2][5:]})
         self.top10_takes_last_six_months = self.top10_takes_last_six_months.astype(int)

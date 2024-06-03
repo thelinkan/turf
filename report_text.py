@@ -15,12 +15,13 @@ def create_introtext(turfdata):
     introtext = introtext + f"med {turfdata.top10_takes_new.iloc[0]} besök.\n\n"
     introtext = introtext + f" Totalt har zoner tagits från {turfdata.unika_turfare_t0} olika turfare, en ökning med {turfdata.nya_turfare_t0} under senaste halvåret.\n\n"
     introtext = introtext + f" {turfdata.num_hotzones} zoner är högtrafikszoner, dvs {turfdata.turfname} har tagit de zonerna minst 50 gånger varje halvår de senaste fyra halvåren. "
-    introtext = introtext + f" Därutöver är {turfdata.num_freqzones} zoner frekvent besökta (minst 20 besök per halvår de senaste fyra halvåren, men inte högtrafikszon) v"
+    introtext = introtext + f" Därutöver är {turfdata.num_freqzones} zoner frekvent besökta (minst 20 besök per halvår de senaste fyra halvåren, men inte högtrafikszon) "
     introtext = introtext + f" och {turfdata.num_regularzones} zoner är besökta minst 5 gånger per halvår de senaste fyra halvåren, men inte frekvent eller högtrafik.\n\n"
-    introtext = introtext + f" {turfdata.num_coldzones} zoner är kalla zoner. De har besökts minst 101 gånger var totalt, men de senaste fyra halvåren har det blivit som mest "
-    introtext = introtext + f" ett besök varje halvår. \n\n"
+    introtext = introtext + f" {turfdata.num_coldzones} zoner är kalla zoner. De har besökts många gånger tidigare, minst 101 gånger var totalt, men de senaste fyra halvåren har "
+    introtext = introtext + f" det blivit som mest ett besök varje halvår. \n\n"
     introtext = introtext + f" {turfdata.turfname} har varit en dominant besökare i {turfdata.num_zones_33percent} zoner."
-    introtext = introtext + f" En turfare räknas som dominant besökare om hen har varit närvarande vid minst 33 procent av alla besökstillfällen. \n\n"
+    introtext = introtext + f" En turfare räknas som dominant besökare om hen har varit närvarande vid minst 33 procent av alla besökstillfällen som någonsin gjorts i zonen. "
+    introtext = introtext + f" Endast takes och revisits räknas som besökstillfällen, och är det som fås från turfAPI. \n\n"
 
     introtext = introtext.replace('\n','<br />\n')
     return introtext
@@ -39,22 +40,26 @@ def create_halfyeartext(turfdata):
         if turfdata.num_regions_2new>0:
             halfyeartext = halfyeartext + f" {turfdata.num_regions_new} av dessa regioner var helt nya, jämfört med {turfdata.num_regions_2new} föregående halvår. "
         else:
-            halfyeartext = halfyeartext + f" {turfdata.num_regions_new} av dessa regioner var helt nya. "
+            halfyeartext = halfyeartext + f" {turfdata.num_regions_new} av dessa regioner var helt nya. Föregående halvår togs inga zoner i helt nya regioner."
     else:
         if turfdata.num_regions_2new>0:
             halfyeartext = halfyeartext + f" Det var inga nya regioner det senaste halvåret, men {turfdata.num_regions_2new} var nya föregående halvår. "
     halfyeartext = halfyeartext + f"Av besöken detta halvår gjordes totalt {turfdata.takes_newzones} besök vid {turfdata.num_zones_newzones} nya zoner. "
+    halfyeartext = halfyeartext + f"{turfdata.num_newzones_green} av dessa zoner besöktes endast en enda gång. "
+    halfyeartext = halfyeartext +f"Under föregående halvår besöktes {turfdata.num_newzones_prev} nya zoner, varav {turfdata.num_newzones_prev_revisit} "
+    halfyeartext = halfyeartext + f"besöktes även detta halvår.\n\n"
     #halfyeartext = halfyeartext + f"Motsvarande halvår för ett år sedan var det {takes_newzones_prev2} besök vid {num_zones_newzones} nya zoner. "
-
-
-    if turfdata.nya_ftt_t0>0:
-        halfyeartext = halfyeartext + f" Du lyckades vara den första turfaren att ta {turfdata.nya_ftt_t0} zoner (så kallad ftt).\n\n "
-    else:
-        halfyeartext = halfyeartext + f" Du lyckades inte vara den första turfaren att ta några zoner det senaste halvåret. \n\n"
 
     if(turfdata.num_zones_changed>0):
         halfyeartext = halfyeartext + f"Antalet besök i de nya zonerna kan vara något överskattad, då {turfdata.num_zones_changed} zoner antingen har bytt "
         halfyeartext = halfyeartext + f"namn under det senaste halvåret eller tagits bort utan att det kunnat korrigeras för. \n\n"
+
+    if turfdata.nya_ftt_t0>0:
+        halfyeartext = halfyeartext + f" {turfdata.turfname} lyckades vara den första turfaren att ta {turfdata.nya_ftt_t0} zoner (så kallad ftt).\n\n "
+    else:
+        halfyeartext = halfyeartext + f" {turfdata.turfname} lyckades inte vara den första turfaren att ta några zoner det senaste halvåret. \n\n"
+
+
 
     halfyeartext = halfyeartext + f"Tabellen nedan visar hur många gånger {turfdata.turfname} besökt var och en av de tio zoner som besökts mest under de senaste sex månaderna,"
     halfyeartext = halfyeartext + f"samt hur många besök som gjorts i respektive zon de föregående sex månaderna. \n\n"
