@@ -198,3 +198,39 @@ def plot_stacked_series(*series, filename = 'file.png' , title='Line Plot', xlab
     plt.show()
     
     return plt
+
+def plot_stacked_area(series: tuple, filename: str = 'file.png', title: str = 'Stacked Area Chart', xlabel: str = 'X-axis', ylabel: str = 'Y-axis'):
+    """
+    Creates a stacked area chart for the given series on the same figure.
+
+    Parameters:
+    series (tuple): Tuple of pandas.Series objects.
+    title (str): Title for the plot.
+    xlabel (str): Label for the x-axis.
+    ylabel (str): Label for the y-axis.
+    """
+    # Extract the index for the x-axis
+    index = series[0].index
+
+    # Extract data from each series and convert them to a 2D list
+    data = [s.values for s in series]
+    labels = [s.name for s in series]
+
+    # Create a stacked area plot
+    plt.stackplot(index, *data, labels=labels)
+
+    # Add title and axis labels
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.xticks(rotation=45)
+
+    # Add legend
+    plt.legend(loc='upper left')
+    plt.savefig(filename, dpi=300)
+    plt.close()
+    
+    # Display the plot
+    #plt.show()
+    
+    return plt

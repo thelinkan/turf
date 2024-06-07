@@ -10,7 +10,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.enums import TA_CENTER
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle, Image
 
-from format_data import takes_data, plot_series, plot_stacked_series
+from format_data import takes_data, plot_series, plot_stacked_series, plot_stacked_area
 from console_output import print_df
 from report_text import create_introtext, create_wardedtext, create_halfyeartext, create_newtext, create_totaltext, create_interactiontext
 from report_text import create_regionaltext
@@ -123,7 +123,7 @@ plot_series(turfdata.df_count_takes_trans['2 - 10'],turfdata.df_count_takes_tran
 diagram_2till50 = Image("2till50.png", width = 14*cm, height = 7 * cm)
 plot_series(turfdata.df_count_takes_trans['51 - 100'],turfdata.df_count_takes_trans['101 - 250'], filename = '51till250.png', title='Ljuslila', xlabel='halvår', ylabel='Besök')
 diagram_51till250 = Image("51till250.png", width = 14*cm, height = 7 * cm)
-plot_series(turfdata.df_count_takes_trans['251 - 500'],turfdata.df_count_takes_trans['501 - 1000'],turfdata.df_count_takes_trans['1001 och mer'], filename = '251ochmer.png', title='Mörklila', xlabel='halvår', ylabel='Besök')
+plot_stacked_area((turfdata.df_count_takes_trans['251 - 500'],turfdata.df_count_takes_trans['501 - 1000'],turfdata.df_count_takes_trans['1001 och mer']), filename = '251ochmer.png', title='Mörklila', xlabel='halvår', ylabel='Besök')
 diagram_251ochmer = Image("251ochmer.png", width = 14*cm, height = 8 * cm)
 
 halfyear_heading = Paragraph("Senaste 6 månadernas turfande", style_small_title)
