@@ -3,14 +3,14 @@ import pandas as pd
 from format_data import import_data, takes_data
 
 class TurfData:
-    def __init__(self, turfname, artal, manad) -> None:
-        self.turfname=turfname
-        self.artal = artal
-        self.manad = manad
+    def __init__(self, turfname: str, artal: int, manad: int) -> None:
+        self.turfname: str =turfname
+        self.artal:int = artal
+        self.manad:int = manad
         pass
 
-    def import_main_dfs(self,file_list):
-        num_obs = len(file_list)
+    def import_main_dfs(self,file_list: list[str]) -> None:
+        num_obs: int = len(file_list)
         self.df_takes, self.df_turfdata, self.df_zones, self.df_sverige_areas = import_data(file_list)
 
         self.df_turfdata_trans = self.df_turfdata.transpose()
@@ -41,8 +41,31 @@ class TurfData:
         self.takes_changed = int(self.df_filtered_2[self.df_filtered_2.columns[-1]].sum())
         self.takes_newzones = self.takes_newzones - self.takes_changed
 
-        
-    def set_df_count_takes(self ):
+        print(self.df_takes_halfyear)
+
+        self.df_since_last = self.df_takes_halfyear.drop(['Type'], axis=1)
+        self.df_since_last["Senast"] =-1
+        self.df_since_last["Senast2"] =-1
+
+        halfyear_col_name = file_list[num_obs-1]+'halfyear'
+        col_name = file_list[num_obs-1]
+        self.df_since_last.loc[self.df_since_last[col_name] == 0, "Senast"] = -2
+        self.df_since_last.loc[self.df_since_last[halfyear_col_name] > 0, "Senast"] = 0
+        self.df_since_last.loc[self.df_since_last[halfyear_col_name] > 0, "Senast2"] = 0
+
+        for i in range(1,num_obs-1):
+            halfyear_col_name = file_list[num_obs-i-1]+'halfyear'
+            col_name = file_list[num_obs-i-1]
+            self.df_since_last.loc[(self.df_since_last[halfyear_col_name] > 0) & (self.df_since_last["Senast"] == -1), "Senast"] = i
+            self.df_since_last.loc[(self.df_since_last[halfyear_col_name] > 0) & (self.df_since_last["Senast2"] == 0), "Senast2"] = i
+            #print(f"{i} col_name {col_name}")
+
+        #print(self.df_since_last[(self.df_since_last[file_list[num_obs-1]])==0])
+        self.df_since_last.to_excel("c:/temp/df_since_last.xlsx")
+        #for i in range(1,num_obs+1):
+        #    print(file_list[num_obs-i])
+
+    def set_df_count_takes(self ) -> None:
         
         self.df_count_takes = takes_data(self.df_takes.drop(['Country','Region','Area','Type','Takeovers'], axis=1))
         self.df_count_takes_trans = self.df_count_takes.transpose()
@@ -50,8 +73,8 @@ class TurfData:
 
         self.df_wardedfarger = self.df_count_takes.iloc[:,-6:]
 
-    def count_unique_zones(self, file_list):
-        num_obs = len(file_list)
+    def count_unique_zones(self, file_list : list[str]) -> None:
+        num_obs: int = len(file_list)
         total_t0 = self.df_count_takes_trans['Totalt'].iloc[num_obs-1]
         gron_t0 =  self.df_count_takes_trans['1'].iloc[num_obs-1]
         gul_t0 =  self.df_count_takes_trans['2 - 10'].iloc[num_obs-1]
@@ -80,7 +103,7 @@ class TurfData:
         self.nya_unika_t1 = total_t1 - total_t2
         self.nya_unika_t2 = total_t2 - total_t3
 
-    def count_unique_turfers(self, file_list):
+    def count_unique_turfers(self) -> None:
         num_obs_turfdata = self.df_turfdata_trans.shape[0]
 
         self.unika_turfare_t0 = int(self.df_turfdata_trans['uniqueturfers'].iloc[num_obs_turfdata-1])
@@ -102,8 +125,8 @@ class TurfData:
         self.nya_assist_t1 = self.unika_assist_t1 - self.unika_assist_t2
         
 
-    def create_df_countries_regions(self,file_list):
-        num_obs = len(file_list)
+    def create_df_countries_regions(self, file_list: list[str]) -> None:
+        num_obs: int = len(file_list)
         #dfa = self.df_takes.loc[self.df_takes[file_list[num_obs-1]]>0]
         dfa = self.df_takes_halfyear.loc[(self.df_takes['Country']!='None') & (self.df_takes['Country']!='se')]
         self.df_countries_off = pd.DataFrame.from_dict(dfa['Country'].value_counts())
@@ -198,8 +221,8 @@ class TurfData:
         self.num_areas_halfyear = (self.df_halfyear_areas[self.df_halfyear_areas.columns[-1]] > 0).sum()
         self.num_areas_halfyear_prev = (self.df_halfyear_areas[self.df_halfyear_areas.columns[-2]] > 0).sum()
 
-    def hotzones(self, file_list):
-        num_obs = len(file_list)
+    def hotzones(self, file_list: list[str]) -> None:
+        num_obs: int = len(file_list)
         col_name = file_list[num_obs-1]
         halfyear_col_name = file_list[num_obs-1]+'halfyear'
         halfyear_col_name2 = file_list[num_obs-2]+'halfyear'
@@ -216,8 +239,8 @@ class TurfData:
         print(f"{self.num_hotzones} - {self.num_freqzones-self.num_hotzones} - {self.num_regularzones-self.num_freqzones} - {self.num_coldzones}")
         print(df_filtered)
 
-    def create_top10s(self, file_list):
-        num_obs = len(file_list)
+    def create_top10s(self, file_list: list[str]) -> None:
+        num_obs: int = len(file_list)
 
         df_filtered = self.df_takes_halfyear[(self.df_takes_halfyear[file_list[num_obs-2]] == 0) & (self.df_takes_halfyear.iloc[:, -1] > 0)][[self.df_takes_halfyear.columns[-2], self.df_takes_halfyear.columns[-1]]]
         df_filtered_prev = self.df_takes_halfyear[(self.df_takes_halfyear[file_list[num_obs-3]] == 0) & (self.df_takes_halfyear.iloc[:, -2] > 0)][[self.df_takes_halfyear.columns[-2], self.df_takes_halfyear.columns[-1]]]
@@ -252,8 +275,8 @@ class TurfData:
         self.top10_zones_per_region_halfyear_prev = df_halfyear_regions[halfyear_col_name_prev].nlargest(10).astype(int)
         self.top10_zones_per_region_prev = self.df_regions[col_name_prev].nlargest(10).astype(int)
 
-    def shares(self,file_list):
-        num_obs = len(file_list)
+    def shares(self, file_list: list[str]) -> None:
+        num_obs:int = len(file_list)
         col_name = file_list[num_obs-1]
         df_takes_share = self.df_takes_halfyear[(self.df_takes_halfyear['Takeovers']>0)]
         df_takes_share['share'] = 100 * df_takes_share[col_name] / df_takes_share['Takeovers']

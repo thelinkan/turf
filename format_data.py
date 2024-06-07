@@ -3,7 +3,7 @@ import json
 import matplotlib.pyplot as plt
 import os
 
-def import_data(file_list):
+def import_data(file_list: list[str]) -> tuple[pd.DataFrame, pd.DataFrame , pd.DataFrame, pd.DataFrame]:
     data_dict = {}
     turfdata_dict = {}
     alla_dict = {}
@@ -136,7 +136,7 @@ def takes_data(df):
     return df_counts
 
 
-def plot_series(*series, filename = 'file.png' , title='Line Plot', xlabel='X-axis', ylabel='Y-axis'):
+def plot_series(*series:tuple, filename :str = 'file.png', title :str ='Line Plot', xlabel :str ='X-axis', ylabel:str ='Y-axis'):
     """
     Creates a line plot for each of the given series on the same figure.
 

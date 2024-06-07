@@ -61,7 +61,7 @@ def create_halfyeartext(turfdata):
 
 
 
-    halfyeartext = halfyeartext + f"Tabellen nedan visar hur många gånger {turfdata.turfname} besökt var och en av de tio zoner som besökts mest under de senaste sex månaderna,"
+    halfyeartext = halfyeartext + f"Tabellen nedan visar hur många gånger {turfdata.turfname} besökt var och en av de tio zoner som besökts mest under de senaste sex månaderna, "
     halfyeartext = halfyeartext + f"samt hur många besök som gjorts i respektive zon de föregående sex månaderna. \n\n"
     halfyeartext=halfyeartext.replace('\n','<br />\n')
     return halfyeartext

@@ -20,10 +20,9 @@ from styles import style, style_top10, styles, style_normal,style_small_title,st
 
 turfname='TheLinkan'
 
-
 file_list = ['takes201610', 'takes201704','takes201710', 'takes201804','takes201810', 'takes201904', 'takes201910', 'takes202004','takes202010', 'takes202104', 'takes202110', 'takes202204', 'takes202210', 'takes202304', 'takes202310', 'takes202404']
 manad_lista = ["januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"]
-num_obs = len(file_list)
+num_obs: int = len(file_list)
 artal = file_list[num_obs-1][5:9]
 artal_int = int(artal)
 manad = int(file_list[num_obs-1][9:11])
@@ -68,7 +67,7 @@ turfdata.df_regions.to_excel("c:/temp/df_regions.xlsx")
 
 turfdata.create_top10s(file_list)
 turfdata.count_unique_zones(file_list)
-turfdata.count_unique_turfers(file_list)
+turfdata.count_unique_turfers()
 
 print_df(turfdata.top10_takes_last_six_months,"top10_takes_last_six_months")
 
