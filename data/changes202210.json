@@ -20,6 +20,13 @@
                 "old_name": "ChristianBorg",
                 "new_name": "Christianborg"
             }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "HoyVikZone",
+                "new_name": "Hoyvíkstjørn"
+            }
         }
     ]
 }

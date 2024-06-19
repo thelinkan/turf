@@ -20,6 +20,13 @@
                 "old_name": "VegaVallen",
                 "new_name": "Vegavallen"
             }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "SäterKyrka",
+                "new_name": "SätersKyrka"
+            }
         }
     ]
 }
