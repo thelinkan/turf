@@ -1,0 +1,46 @@
+{
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Aff\u00e4rzon",
+                "new_name": "Aff\u00e4rsv\u00e4g"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "ArenaGoran",
+                "new_name": "ArenaG\u00f6ran"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "HavnarKirka",
+                "new_name": "HavnarKirkja"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "GlimmingeHus",
+                "new_name": "Glimmingehus"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "AsenWater",
+                "new_name": "\u00c5senWater"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "AlvikStrand",
+                "new_name": "AlviksStrand"
+            }
+        }
+    ]
+}
