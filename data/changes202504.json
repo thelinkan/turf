@@ -1,0 +1,88 @@
+{
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Herrg\u00e5rdsZon",
+                "new_name": "Herrg\u00e5rdszon"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Reningkraft",
+                "new_name": "Reningskraft"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "KastellBerg",
+                "new_name": "Kastellberg"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "ARNfour",
+                "new_name": "ARNxFour"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Sollstation",
+                "new_name": "SollStation"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Tumbazone",
+                "new_name": "TumbaZone"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Highbridge",
+                "new_name": "HighBridge"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "K\u00e4rnboZon",
+                "new_name": "K\u00e4rnbozon"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "VitaAnskarii",
+                "new_name": "VitaAnsgarii"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Essinge",
+                "new_name": "Essingen"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Highhope",
+                "new_name": "HighHope"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "MunsbitZonen",
+                "new_name": "Munsbiten"
+            }
+        }
+    ]
+}
