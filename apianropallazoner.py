@@ -10,6 +10,6 @@ response = requests.get(url)
 print(response.status_code)
 #print(response.text)
 
-f = open("data/allzonesv5202504.json", "a", encoding='utf-8')
+f = open("data/allzonesv5202510.json", "a", encoding='utf-8')
 f.write(response.text)
 f.close()

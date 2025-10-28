@@ -1,0 +1,25 @@
+{
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Squaretrees",
+                "new_name": "SquareTrees"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "L\u00e9opold",
+                "new_name": "EUParliament"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "old_name": "Teacherzone",
+                "new_name": "TeacherZone"
+            }
+        }
+    ]
+}
